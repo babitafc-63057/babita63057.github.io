@@ -1,0 +1,1827 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Chroma Palette Tool</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap');
+
+    :root {
+      --bg: #f7f7f5;
+      --panel: #ffffff;
+      --line: #efefed;
+      --line-2: #e0e0de;
+      --text: #1a1a1a;
+      --muted: #9b9b95;
+      --dark: #1a1a1a;
+      --ok: #2a6a3a;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: "DM Sans", sans-serif;
+      color: var(--text);
+      background: radial-gradient(circle at top, #ffffff 0%, var(--bg) 42%, #f0f0ed 100%);
+      min-height: 100vh;
+    }
+
+    button,
+    input,
+    select,
+    textarea {
+      font: inherit;
+    }
+
+    .app {
+      min-height: 100vh;
+    }
+
+    .topbar {
+      background: var(--panel);
+      border-bottom: 1px solid var(--line);
+      padding: 0 22px;
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: stretch;
+      gap: 10px;
+      position: sticky;
+      top: 0;
+      z-index: 20;
+    }
+
+    .brand-wrap,
+    .season-badge-wrap {
+      display: flex;
+      align-items: center;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 13px 0;
+    }
+
+    .brand-bars {
+      display: flex;
+      gap: 3px;
+    }
+
+    .brand-bars span {
+      width: 6px;
+      height: 24px;
+      display: block;
+    }
+
+    .brand-title {
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      line-height: 1;
+    }
+
+    .brand-sub {
+      font-size: 9px;
+      font-weight: 500;
+      letter-spacing: 0.22em;
+      color: #bbb;
+      margin-top: 1px;
+    }
+
+    .tabs {
+      display: flex;
+      align-items: stretch;
+    }
+
+    .tab {
+      background: none;
+      border: none;
+      border-bottom: 2px solid transparent;
+      color: #aaa;
+      cursor: pointer;
+      padding: 14px 16px;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      transition: color 0.2s, border-color 0.2s;
+    }
+
+    .tab:hover {
+      color: #555;
+    }
+
+    .tab.on {
+      color: var(--text);
+      border-bottom-color: var(--dark);
+    }
+
+    .season-badge {
+      margin-left: auto;
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.14em;
+      color: #bdbdb6;
+    }
+
+    .view {
+      min-height: calc(100vh - 57px);
+      animation: fadeIn 0.22s ease;
+    }
+
+    .collections-layout {
+      display: grid;
+      grid-template-columns: 230px 1fr 220px;
+      min-height: calc(100vh - 57px);
+    }
+
+    .build-layout {
+      display: grid;
+      grid-template-columns: 1fr 230px;
+      min-height: calc(100vh - 57px);
+    }
+
+    .trendboard-layout {
+      display: grid;
+      grid-template-columns: 265px 1fr 250px;
+      min-height: calc(100vh - 57px);
+    }
+
+    .panel {
+      background: var(--panel);
+      overflow: auto;
+    }
+
+    .panel.left {
+      border-right: 1px solid var(--line);
+    }
+
+    .panel.right {
+      border-left: 1px solid var(--line);
+      padding: 18px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .canvas {
+      padding: 24px 28px;
+      overflow: auto;
+    }
+
+    .section-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: #bbb;
+      margin-bottom: 8px;
+    }
+
+    .sub-label {
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      color: #888;
+      margin-bottom: 8px;
+      text-transform: uppercase;
+    }
+
+    .section-head {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: #bbb;
+      margin-bottom: 10px;
+      padding-bottom: 6px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .row-wrap {
+      padding: 14px 18px 10px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .btn-chip {
+      border: 1px solid var(--line-2);
+      background: #fff;
+      color: #888;
+      cursor: pointer;
+      padding: 5px 11px;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      transition: all 0.15s;
+    }
+
+    .btn-chip:hover {
+      border-color: #9e9e98;
+      color: #444;
+    }
+
+    .btn-chip.on {
+      background: var(--dark);
+      border-color: var(--dark);
+      color: #fff;
+    }
+
+    .collection-row {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      border-left: 3px solid transparent;
+      border-bottom: 1px solid var(--line);
+      padding: 13px 18px;
+      cursor: pointer;
+      transition: background 0.14s;
+    }
+
+    .collection-row:hover {
+      background: #f3f3f1;
+    }
+
+    .collection-row.on {
+      background: #fff;
+      border-left-color: var(--dark);
+    }
+
+    .collection-mini-grid {
+      width: 48px;
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 2px;
+      flex-shrink: 0;
+    }
+
+    .collection-mini-grid span {
+      height: 16px;
+      display: block;
+    }
+
+    .muted {
+      color: #bbb;
+      font-size: 10px;
+      letter-spacing: 0.08em;
+    }
+
+    .mono {
+      font-family: "DM Mono", monospace;
+    }
+
+    .color-grid-lg {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 12px;
+      margin-bottom: 26px;
+    }
+
+    .color-grid-5 {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+
+    .color-chip {
+      border: none;
+      background: transparent;
+      display: flex;
+      flex-direction: column;
+      text-align: left;
+      width: 100%;
+      cursor: pointer;
+      transition: transform 0.18s cubic-bezier(.34,1.4,.64,1), box-shadow 0.18s;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    }
+
+    .color-chip:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.14);
+    }
+
+    .color-chip.selected {
+      transform: translateY(-6px);
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.18);
+    }
+
+    .chip-color {
+      position: relative;
+      overflow: hidden;
+      border: 2px solid transparent;
+      border-bottom: none;
+    }
+
+    .color-chip.selected .chip-color {
+      border-color: var(--dark);
+    }
+
+    .chip-meta {
+      background: #fff;
+      border: 2px solid #e8e8e8;
+      border-top: none;
+      padding: 5px 7px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .color-chip.selected .chip-meta {
+      border-color: var(--dark);
+    }
+
+    .chip-name {
+      font-size: 8px;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+      color: var(--text);
+      line-height: 1.2;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .chip-code {
+      font-size: 7px;
+      color: #8e8e8e;
+      letter-spacing: 0.06em;
+      margin-top: 1px;
+      font-family: monospace;
+    }
+
+    .chip-copy {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 15px;
+      font-weight: 700;
+    }
+
+    .chip-sm .chip-color { height: 80px; }
+    .chip-sm .chip-meta { height: 32px; }
+
+    .chip-md .chip-color { height: 110px; }
+    .chip-md .chip-meta { height: 40px; }
+
+    .chip-lg .chip-color { height: 140px; }
+    .chip-lg .chip-meta { height: 48px; }
+    .chip-lg .chip-name { font-size: 9px; }
+
+    .chip-mini {
+      width: 100%;
+      border: none;
+      background: transparent;
+      text-align: left;
+      cursor: pointer;
+      transition: transform 0.15s;
+    }
+
+    .chip-mini:hover {
+      transform: translateY(-2px);
+    }
+
+    .chip-mini .chip-color {
+      border: 1.5px solid #e8e8e8;
+      border-bottom: none;
+      height: 48px;
+    }
+
+    .chip-mini .chip-meta {
+      border: 1.5px solid #e8e8e8;
+      border-top: none;
+      padding: 3px 4px;
+    }
+
+    .chip-mini .chip-name {
+      font-size: 7px;
+    }
+
+    .chip-mini .chip-code {
+      font-size: 6px;
+      color: #aaa;
+    }
+
+    .line-gradient {
+      height: 6px;
+      margin-bottom: 16px;
+    }
+
+    .trend-chip {
+      border: 1px solid var(--line-2);
+      background: #fff;
+      color: #888;
+      cursor: pointer;
+      padding: 4px 10px;
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      transition: all 0.15s;
+    }
+
+    .trend-chip:hover {
+      border-color: #999;
+      color: #444;
+    }
+
+    .trend-chip.on {
+      background: var(--dark);
+      border-color: var(--dark);
+      color: #fff;
+    }
+
+    .save-btn {
+      border: 1.5px solid var(--dark);
+      background: var(--dark);
+      color: #fff;
+      cursor: pointer;
+      width: 100%;
+      padding: 11px 0;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      transition: all 0.16s;
+    }
+
+    .save-btn:hover {
+      background: #323232;
+    }
+
+    .save-btn.done {
+      background: var(--ok);
+      border-color: var(--ok);
+    }
+
+    .meta-card {
+      border: 1px solid #e8e8e8;
+      background: #fff;
+      padding: 12px;
+    }
+
+    .meta-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid #f0f0f0;
+      padding: 6px 0;
+      font-size: 11px;
+    }
+
+    .empty {
+      border: 2px dashed #e0e0e0;
+      background: #fff;
+      min-height: 160px;
+      display: grid;
+      place-items: center;
+      text-align: center;
+      margin-bottom: 20px;
+      color: #ccc;
+      padding: 10px;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      background: #f5f5f3;
+      border: 1px solid #e8e8e6;
+      padding: 4px 10px;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+    }
+
+    .pill button {
+      border: none;
+      background: none;
+      color: #bbb;
+      cursor: pointer;
+      font-size: 10px;
+      line-height: 1;
+    }
+
+    .text-block {
+      background: #fff;
+      border: 1px solid var(--line);
+      padding: 14px 16px;
+      position: relative;
+    }
+
+    .text-toolbar {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      margin-bottom: 8px;
+      flex-wrap: wrap;
+    }
+
+    .text-style-btn {
+      border: 1px solid var(--line-2);
+      background: #fff;
+      color: #888;
+      cursor: pointer;
+      padding: 2px 7px;
+      font-size: 9px;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      transition: all 0.12s;
+    }
+
+    .text-style-btn.on {
+      background: var(--dark);
+      color: #fff;
+      border-color: var(--dark);
+    }
+
+    .icon-btn {
+      border: 1px solid #ddd;
+      background: #fff;
+      color: #888;
+      cursor: pointer;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      font-size: 10px;
+    }
+
+    .icon-btn.soft {
+      border: none;
+      border-radius: 0;
+      width: auto;
+      height: auto;
+      background: transparent;
+      color: #ccc;
+      padding: 0 2px;
+      font-size: 12px;
+    }
+
+    textarea,
+    input[type="text"],
+    select {
+      border: 1px solid var(--line-2);
+      background: #fff;
+      color: var(--text);
+      outline: none;
+    }
+
+    textarea {
+      width: 100%;
+      resize: none;
+      padding: 11px 12px;
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    textarea:focus,
+    input[type="text"]:focus,
+    select:focus {
+      border-color: #1a1a1a;
+    }
+
+    input[type="text"] {
+      width: 100%;
+      padding: 6px 8px;
+      font-size: 11px;
+    }
+
+    input[type="color"] {
+      -webkit-appearance: none;
+      border: 1.5px solid var(--line-2);
+      width: 44px;
+      height: 44px;
+      cursor: pointer;
+      padding: 2px;
+      background: none;
+    }
+
+    input[type="color"]:hover {
+      border-color: var(--dark);
+    }
+
+    input[type="color"]::-webkit-color-swatch-wrapper {
+      padding: 0;
+    }
+
+    input[type="color"]::-webkit-color-swatch {
+      border: none;
+    }
+
+    .saved-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 16px;
+    }
+
+    .saved-card {
+      border: 1px solid var(--line);
+      background: #fff;
+    }
+
+    .saved-strip {
+      height: 80px;
+      display: grid;
+    }
+
+    .saved-footer {
+      padding: 14px 16px;
+      border-top: 1px solid var(--line);
+    }
+
+    .split-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 3px;
+      height: 200px;
+      margin-bottom: 20px;
+    }
+
+    .wide-strip {
+      display: flex;
+      gap: 2px;
+      height: 120px;
+      margin-bottom: 4px;
+    }
+
+    .wide-item {
+      flex: 1;
+      position: relative;
+      transition: flex 0.2s;
+    }
+
+    .wide-item:hover {
+      flex: 1.4;
+    }
+
+    .swatch-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .swatch-grid.free {
+      grid-template-columns: repeat(auto-fill, minmax(72px, 1fr));
+      gap: 8px;
+      margin-bottom: 0;
+    }
+
+    .relative {
+      position: relative;
+    }
+
+    .remove-btn {
+      position: absolute;
+      top: -6px;
+      right: -6px;
+      z-index: 2;
+    }
+
+    .tb-header {
+      background: #fff;
+      border-bottom: 1px solid var(--line);
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .tb-header input[type="text"] {
+      border: none;
+      background: transparent;
+      font-size: 18px;
+      font-weight: 700;
+      flex: 1;
+      min-width: 170px;
+      padding: 0;
+    }
+
+    .tb-header input[type="text"]:focus {
+      border: none;
+    }
+
+    .layout-btn {
+      border: 1px solid var(--line-2);
+      background: #fff;
+      color: #888;
+      cursor: pointer;
+      padding: 4px 8px;
+      font-size: 9px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      transition: all 0.15s;
+    }
+
+    .layout-btn.on {
+      background: var(--dark);
+      color: #fff;
+      border-color: var(--dark);
+    }
+
+    .tb-palette-source {
+      padding: 8px 16px;
+      border-top: 1px solid #f5f5f5;
+      background: #fafafa;
+    }
+
+    .tb-collection-grid {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 3px;
+      padding: 6px 16px 10px;
+    }
+
+    .tb-collection-color {
+      height: 28px;
+      cursor: pointer;
+      border: 1.5px solid transparent;
+      transition: transform 0.15s, border-color 0.15s;
+    }
+
+    .tb-collection-color:hover {
+      transform: scale(1.12);
+      border-color: var(--dark);
+    }
+
+    .tb-collection-color.on {
+      border-color: var(--dark);
+    }
+
+    .tb-summary-strip {
+      display: flex;
+      gap: 2px;
+      margin-bottom: 8px;
+    }
+
+    .tb-summary-strip div {
+      flex: 1;
+      height: 28px;
+      border: 1px solid var(--line);
+    }
+
+    .h-scroll {
+      overflow-x: auto;
+      display: flex;
+      gap: 3px;
+      flex-wrap: nowrap;
+    }
+
+    .h-scroll button {
+      white-space: nowrap;
+    }
+
+    .small-muted {
+      font-size: 9px;
+      color: #bbb;
+    }
+
+    .saved-empty {
+      text-align: center;
+      padding: 100px 0;
+      color: #ccc;
+    }
+
+    @media (max-width: 1200px) {
+      .collections-layout,
+      .trendboard-layout {
+        grid-template-columns: 210px 1fr;
+      }
+
+      .collections-layout .panel.right,
+      .trendboard-layout .panel.right {
+        grid-column: 1 / -1;
+        border-left: none;
+        border-top: 1px solid var(--line);
+      }
+
+      .trendboard-layout .canvas {
+        min-height: 420px;
+      }
+    }
+
+    @media (max-width: 900px) {
+      .topbar {
+        grid-template-columns: 1fr;
+        padding: 0 14px;
+      }
+
+      .season-badge-wrap {
+        display: none;
+      }
+
+      .tabs {
+        overflow-x: auto;
+      }
+
+      .collections-layout,
+      .build-layout,
+      .trendboard-layout {
+        grid-template-columns: 1fr;
+      }
+
+      .panel.left,
+      .panel.right {
+        border: none;
+        border-top: 1px solid var(--line);
+      }
+
+      .canvas {
+        padding: 18px 14px;
+      }
+
+      .color-grid-lg,
+      .color-grid-5 {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .saved-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(4px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    ::-webkit-scrollbar {
+      width: 4px;
+      height: 4px;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: #ddd;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+  </style>
+</head>
+<body>
+  <div class="app" id="app"></div>
+
+  <script>
+    function hexToRgb(hex) {
+      return {
+        r: parseInt(hex.slice(1, 3), 16),
+        g: parseInt(hex.slice(3, 5), 16),
+        b: parseInt(hex.slice(5, 7), 16),
+      };
+    }
+
+    function hexToHsl(hex) {
+      let rgb = hexToRgb(hex);
+      let r = rgb.r / 255;
+      let g = rgb.g / 255;
+      let b = rgb.b / 255;
+      let max = Math.max(r, g, b);
+      let min = Math.min(r, g, b);
+      let h = 0;
+      let s = 0;
+      let l = (max + min) / 2;
+      if (max !== min) {
+        const d = max - min;
+        s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+        switch (max) {
+          case r:
+            h = ((g - b) / d + (g < b ? 6 : 0)) / 6;
+            break;
+          case g:
+            h = ((b - r) / d + 2) / 6;
+            break;
+          case b:
+            h = ((r - g) / d + 4) / 6;
+            break;
+        }
+      }
+      return {
+        h: Math.round(h * 360),
+        s: Math.round(s * 100),
+        l: Math.round(l * 100),
+      };
+    }
+
+    function hslToHex(h, s, l) {
+      h = ((h % 360) + 360) % 360;
+      s = Math.max(0, Math.min(100, s));
+      l = Math.max(0, Math.min(100, l));
+      const a = s * Math.min(l, 100 - l) / 100;
+      const f = function (n) {
+        const k = (n + h / 30) % 12;
+        return Math.round(255 * (l - a * Math.max(Math.min(k - 3, 9 - k, 1), -1)))
+          .toString(16)
+          .padStart(2, "0");
+      };
+      return "#" + f(0) + f(8) + f(4);
+    }
+
+    function getLuminance(hex) {
+      const rgb = hexToRgb(hex);
+      return 0.299 * rgb.r + 0.587 * rgb.g + 0.114 * rgb.b;
+    }
+
+    function rgbToCmyk(rgb) {
+      let r = rgb.r / 255;
+      let g = rgb.g / 255;
+      let b = rgb.b / 255;
+      const k = 1 - Math.max(r, g, b);
+      if (k === 1) {
+        return { c: 0, m: 0, y: 0, k: 100 };
+      }
+      return {
+        c: Math.round(((1 - r - k) / (1 - k)) * 100),
+        m: Math.round(((1 - g - k) / (1 - k)) * 100),
+        y: Math.round(((1 - b - k) / (1 - k)) * 100),
+        k: Math.round(k * 100),
+      };
+    }
+
+    function generateHarmonies(hex) {
+      const hsl = hexToHsl(hex);
+      const h = hsl.h;
+      const s = hsl.s;
+      const l = hsl.l;
+      return {
+        Monochromatic: [
+          hslToHex(h, s, Math.min(93, l + 32)),
+          hslToHex(h, s, Math.min(93, l + 16)),
+          hex,
+          hslToHex(h, s, Math.max(7, l - 16)),
+          hslToHex(h, s, Math.max(7, l - 32)),
+        ],
+        Analogous: [
+          hslToHex(h - 30, s, l),
+          hslToHex(h - 15, s, l),
+          hex,
+          hslToHex(h + 15, s, l),
+          hslToHex(h + 30, s, l),
+        ],
+        Complementary: [
+          hex,
+          hslToHex(h + 30, Math.max(20, s - 10), Math.min(88, l + 18)),
+          hslToHex(h + 180, s, l),
+          hslToHex(h + 150, s, l),
+          hslToHex(h + 210, s, l),
+        ],
+        Triadic: [
+          hex,
+          hslToHex(h + 120, s, l),
+          hslToHex(h + 240, s, l),
+          hslToHex(h + 60, Math.max(20, s - 20), Math.min(90, l + 15)),
+          hslToHex(h + 300, Math.max(20, s - 20), Math.min(90, l + 15)),
+        ],
+      };
+    }
+
+    const COLLECTIONS = [
+      { id: "SS26-COASTAL", name: "Coastal Drift", season: "SS26", category: "Fashion",
+        colors: [
+          { hex: "#E8EFF5", name: "Salt Air", code: "CHR-1102" },
+          { hex: "#BACFE0", name: "Shoreline", code: "CHR-1108" },
+          { hex: "#6A9DB8", name: "Deep Cove", code: "CHR-1115" },
+          { hex: "#3D6E8A", name: "Tidal Blue", code: "CHR-1121" },
+          { hex: "#C9DDD5", name: "Sea Glass", code: "CHR-1130" },
+          { hex: "#F5ECD7", name: "Dune Sand", code: "CHR-1138" },
+        ]},
+      { id: "AW26-EARTH", name: "Terra Profonda", season: "AW26", category: "Fashion",
+        colors: [
+          { hex: "#3B2A1A", name: "Dark Peat", code: "CHR-2204" },
+          { hex: "#7A5535", name: "Clay Brown", code: "CHR-2211" },
+          { hex: "#B8894E", name: "Raw Sienna", code: "CHR-2218" },
+          { hex: "#D4B483", name: "Warm Sand", code: "CHR-2225" },
+          { hex: "#E8D8BC", name: "Linen", code: "CHR-2232" },
+          { hex: "#5C3D22", name: "Mahogany", code: "CHR-2240" },
+        ]},
+      { id: "SS26-BLOOM", name: "Botanical Bloom", season: "SS26", category: "Interior",
+        colors: [
+          { hex: "#E8C4C4", name: "Petal Blush", code: "CHR-3102" },
+          { hex: "#C47A8A", name: "Wild Rose", code: "CHR-3109" },
+          { hex: "#8A4A5A", name: "Deep Fuchsia", code: "CHR-3116" },
+          { hex: "#D4C8A0", name: "Sage Pollen", code: "CHR-3124" },
+          { hex: "#7A9070", name: "Garden Moss", code: "CHR-3131" },
+          { hex: "#F5F0E0", name: "White Petal", code: "CHR-3140" },
+        ]},
+      { id: "AW26-METRO", name: "Urban Grey", season: "AW26", category: "Fashion",
+        colors: [
+          { hex: "#F2F2F0", name: "Chalk", code: "CHR-4102" },
+          { hex: "#D0CFC8", name: "Pale Concrete", code: "CHR-4108" },
+          { hex: "#9E9D94", name: "Stone", code: "CHR-4115" },
+          { hex: "#6A6860", name: "Slate", code: "CHR-4122" },
+          { hex: "#3C3B38", name: "Graphite", code: "CHR-4130" },
+          { hex: "#1A1A18", name: "Carbon", code: "CHR-4138" },
+        ]},
+      { id: "SS26-CITRUS", name: "Sun Market", season: "SS26", category: "Lifestyle",
+        colors: [
+          { hex: "#F5E84A", name: "Lemon Zest", code: "CHR-5102" },
+          { hex: "#F0B830", name: "Saffron", code: "CHR-5108" },
+          { hex: "#E87820", name: "Blood Orange", code: "CHR-5115" },
+          { hex: "#C84820", name: "Paprika", code: "CHR-5122" },
+          { hex: "#F8F0D8", name: "Cream", code: "CHR-5130" },
+          { hex: "#4A3010", name: "Dark Spice", code: "CHR-5138" },
+        ]},
+      { id: "AW26-NIGHT", name: "Nocturne", season: "AW26", category: "Fashion",
+        colors: [
+          { hex: "#0A0C18", name: "Midnight", code: "CHR-6102" },
+          { hex: "#1E2240", name: "Indigo Night", code: "CHR-6108" },
+          { hex: "#3A4070", name: "Dusk Blue", code: "CHR-6115" },
+          { hex: "#6870A8", name: "Lavender Haze", code: "CHR-6122" },
+          { hex: "#C0C4E0", name: "Moonlight", code: "CHR-6130" },
+          { hex: "#E8D060", name: "Star Yellow", code: "CHR-6138" },
+        ]},
+    ];
+
+    const SEASONS = ["All", "SS26", "AW26"];
+    const CATEGORIES = ["All", "Fashion", "Interior", "Lifestyle"];
+    const TREND_TAGS = ["Quiet Luxury","Post-Digital Craft","Climate Grief","Hyperlocal Artisan","Neo-Baroque","Techno-Pastoral","Decolonial Futures","Slow Fashion"];
+    const HARMONY_MODES = ["Monochromatic","Analogous","Complementary","Triadic"];
+    const BOARD_TEXT_STYLES = ["Display", "Headline", "Subhead", "Body", "Caption", "Tag"];
+    const BOARD_LAYOUTS = ["Free Mix", "Wide Strip", "Chip Grid", "Split Panel"];
+    const BOARD_SEASONS = ["SS26", "AW26", "SS27", "AW27"];
+    const BOARD_CATEGORIES = ["Fashion", "Interior", "Lifestyle", "Beauty", "Sport"];
+
+    const TEXT_SIZES = { Display: 28, Headline: 20, Subhead: 15, Body: 13, Caption: 11, Tag: 10 };
+    const TEXT_WEIGHTS = { Display: 700, Headline: 700, Subhead: 600, Body: 400, Caption: 400, Tag: 600 };
+
+    const state = {
+      tab: "collections",
+      selectedCollection: 0,
+      selectedChip: null,
+      seasonFilter: "All",
+      categoryFilter: "All",
+      customColor: "#3D6E8A",
+      harmonyMode: "Monochromatic",
+      activeTrend: null,
+      note: "",
+      saved: [],
+      justSaved: false,
+      copiedKey: null,
+      trendboard: {
+        boardTitle: "Untitled Board",
+        season: "SS26",
+        category: "Fashion",
+        boardSwatches: [],
+        textBlocks: [
+          { id: 1, style: "Display", text: "Colour Story" },
+          { id: 2, style: "Body", text: "Describe the mood, season, cultural context and trend direction for this palette..." },
+        ],
+        keywords: ["Texture", "Warmth", "Restraint"],
+        kwInput: "",
+        layout: "Free Mix",
+        pickerHex: "#6A9DB8",
+        pickerName: "",
+        boards: [],
+        savedMsg: false,
+        nextId: 100,
+      },
+    };
+
+    let saveTimer = null;
+    let copiedTimer = null;
+    let boardSavedTimer = null;
+
+    function escapeHtml(str) {
+      return String(str)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/\"/g, "&quot;")
+        .replace(/'/g, "&#39;");
+    }
+
+    function captureFocus() {
+      const el = document.activeElement;
+      if (!el || !el.matches("input, textarea, select")) return null;
+      return {
+        id: el.id || null,
+        textId: el.dataset.textId || null,
+        start: typeof el.selectionStart === "number" ? el.selectionStart : null,
+        end: typeof el.selectionEnd === "number" ? el.selectionEnd : null,
+      };
+    }
+
+    function restoreFocus(focus) {
+      if (!focus) return;
+      let el = null;
+      if (focus.id) {
+        el = document.getElementById(focus.id);
+      } else if (focus.textId) {
+        el = document.querySelector("textarea[data-text-id=\"" + focus.textId + "\"]");
+      }
+      if (!el) return;
+      el.focus();
+      if (focus.start !== null && typeof el.setSelectionRange === "function") {
+        try {
+          el.setSelectionRange(focus.start, focus.end);
+        } catch (err) {
+          // no-op for unsupported inputs
+        }
+      }
+    }
+
+    function copyHex(hex, key) {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(hex).catch(function () {});
+      }
+      state.copiedKey = key;
+      render();
+      clearTimeout(copiedTimer);
+      copiedTimer = setTimeout(function () {
+        state.copiedKey = null;
+        render();
+      }, 1100);
+    }
+
+    function getFilteredCollections() {
+      return COLLECTIONS.filter(function (c) {
+        return (state.seasonFilter === "All" || c.season === state.seasonFilter) &&
+          (state.categoryFilter === "All" || c.category === state.categoryFilter);
+      });
+    }
+
+    function getCurrentCollection() {
+      return COLLECTIONS[state.selectedCollection] || COLLECTIONS[0];
+    }
+
+    function getCurrentHarmony() {
+      const harmonies = generateHarmonies(state.customColor);
+      return harmonies[state.harmonyMode];
+    }
+
+    function selectedColor() {
+      if (state.tab !== "collections" || state.selectedChip === null) return null;
+      const coll = getCurrentCollection();
+      return coll.colors[state.selectedChip] || null;
+    }
+
+    function renderColorChip(color, opts) {
+      const size = opts.size || "md";
+      const selected = !!opts.selected;
+      const mini = !!opts.mini;
+      const action = opts.action || "copy-hex";
+      const payload = opts.payload || "";
+      const key = opts.copyKey || (color.hex + "-" + action + "-" + payload);
+      const copied = state.copiedKey === key;
+      const lum = getLuminance(color.hex);
+
+      if (mini) {
+        return "<button class=\"chip-mini\" title=\"" + escapeHtml(color.name + " · " + color.hex) + "\" data-action=\"" + action + "\" data-payload=\"" + escapeHtml(payload) + "\" data-copy-key=\"" + escapeHtml(key) + "\" data-hex=\"" + escapeHtml(color.hex) + "\">" +
+          "<div class=\"chip-color\" style=\"background:" + color.hex + "\">" +
+            (copied ? "<div class=\"chip-copy\" style=\"background:rgba(0,0,0,0.18);color:#fff\">✓</div>" : "") +
+          "</div>" +
+          "<div class=\"chip-meta\">" +
+            "<div class=\"chip-name\">" + escapeHtml(color.name || "") + "</div>" +
+            "<div class=\"chip-code\">" + escapeHtml(color.hex.toUpperCase()) + "</div>" +
+          "</div>" +
+        "</button>";
+      }
+
+      return "<button class=\"color-chip chip-" + size + (selected ? " selected" : "") + "\" data-action=\"" + action + "\" data-payload=\"" + escapeHtml(payload) + "\" data-copy-key=\"" + escapeHtml(key) + "\" data-hex=\"" + escapeHtml(color.hex) + "\">" +
+        "<div class=\"chip-color\" style=\"background:" + color.hex + "\">" +
+          (copied ? "<div class=\"chip-copy\" style=\"background:" + (lum < 128 ? "rgba(255,255,255,0.25);color:#fff" : "rgba(0,0,0,0.2);color:#000") + "\">✓</div>" : "") +
+        "</div>" +
+        "<div class=\"chip-meta\">" +
+          (color.name ? "<div class=\"chip-name\">" + escapeHtml(color.name) + "</div>" : "") +
+          "<div class=\"chip-code\">" + escapeHtml((color.code || color.hex).toUpperCase()) + "</div>" +
+        "</div>" +
+      "</button>";
+    }
+
+    function renderDetailPanel(color) {
+      if (!color) {
+        return "<div style=\"display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:8px;opacity:0.32\">" +
+          "<svg width=\"32\" height=\"32\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"#1a1a1a\" stroke-width=\"1.5\"><circle cx=\"12\" cy=\"12\" r=\"10\"></circle><path d=\"M12 8v4m0 4h.01\"></path></svg>" +
+          "<div style=\"font-size:11px;letter-spacing:.1em\">SELECT A CHIP</div>" +
+        "</div>";
+      }
+      const rgb = hexToRgb(color.hex);
+      const hsl = hexToHsl(color.hex);
+      const cmyk = rgbToCmyk(rgb);
+      return "<div>" +
+        "<div style=\"height:120px;background:" + color.hex + ";border:1px solid #e8e8e8;border-bottom:none\"></div>" +
+        "<div class=\"meta-card\" style=\"margin-bottom:12px\">" +
+          "<div style=\"font-size:15px;font-weight:700;margin-bottom:2px\">" + escapeHtml(color.name) + "</div>" +
+          "<div class=\"mono\" style=\"font-size:11px;color:#888;letter-spacing:.08em\">" + escapeHtml(color.code) + "</div>" +
+        "</div>" +
+        "<div class=\"meta-card\">" +
+          "<div class=\"meta-row\"><span class=\"section-label\" style=\"margin:0;color:#aaa;font-size:10px\">HEX</span><span class=\"mono\">" + color.hex.toUpperCase() + "</span></div>" +
+          "<div class=\"meta-row\"><span class=\"section-label\" style=\"margin:0;color:#aaa;font-size:10px\">RGB</span><span class=\"mono\">" + rgb.r + ", " + rgb.g + ", " + rgb.b + "</span></div>" +
+          "<div class=\"meta-row\"><span class=\"section-label\" style=\"margin:0;color:#aaa;font-size:10px\">HSL</span><span class=\"mono\">" + hsl.h + "°, " + hsl.s + "%, " + hsl.l + "%</span></div>" +
+          "<div class=\"meta-row\" style=\"border-bottom:none\"><span class=\"section-label\" style=\"margin:0;color:#aaa;font-size:10px\">CMYK</span><span class=\"mono\">" + cmyk.c + ", " + cmyk.m + ", " + cmyk.y + ", " + cmyk.k + "</span></div>" +
+        "</div>" +
+      "</div>";
+    }
+
+    function renderCollectionsView() {
+      const filtered = getFilteredCollections();
+      const collection = getCurrentCollection();
+      const selColor = selectedColor();
+
+      const filtersSeason = SEASONS.map(function (s) {
+        return "<button class=\"btn-chip" + (state.seasonFilter === s ? " on" : "") + "\" data-action=\"set-season-filter\" data-value=\"" + s + "\">" + s + "</button>";
+      }).join("");
+
+      const filtersCategory = CATEGORIES.map(function (c) {
+        return "<button class=\"btn-chip" + (state.categoryFilter === c ? " on" : "") + "\" data-action=\"set-category-filter\" data-value=\"" + c + "\">" + c + "</button>";
+      }).join("");
+
+      const list = filtered.length === 0
+        ? "<div style=\"padding:24px 20px;font-size:12px;color:#ccc;text-align:center\">No collections match</div>"
+        : filtered.map(function (coll) {
+            const realIdx = COLLECTIONS.indexOf(coll);
+            return "<div class=\"collection-row" + (state.selectedCollection === realIdx ? " on" : "") + "\" data-action=\"select-collection\" data-index=\"" + realIdx + "\">" +
+              "<div class=\"collection-mini-grid\">" + coll.colors.map(function (c) { return "<span style=\"background:" + c.hex + "\"></span>"; }).join("") + "</div>" +
+              "<div><div style=\"font-size:12px;font-weight:600;line-height:1.2\">" + escapeHtml(coll.name) + "</div><div class=\"muted\" style=\"margin-top:2px\">" + coll.season + " · " + coll.category + "</div></div>" +
+            "</div>";
+          }).join("");
+
+      const chips = collection.colors.map(function (color, i) {
+        return renderColorChip(color, {
+          size: "lg",
+          selected: state.selectedChip === i,
+          action: "select-chip",
+          payload: String(i),
+          copyKey: "collection-" + collection.id + "-" + i,
+        });
+      }).join("");
+
+      const codes = collection.colors.map(function (c) {
+        return "<div style=\"display:flex;align-items:center;gap:5px\"><div style=\"width:10px;height:10px;background:" + c.hex + ";border:1px solid #e0e0e0;flex-shrink:0\"></div><div class=\"mono\" style=\"font-size:10px;color:#999;letter-spacing:.05em\">" + c.code + "</div></div>";
+      }).join("");
+
+      const trendTags = TREND_TAGS.map(function (t, i) {
+        return "<button class=\"trend-chip" + (state.activeTrend === i ? " on" : "") + "\" data-action=\"toggle-trend\" data-index=\"" + i + "\">" + escapeHtml(t) + "</button>";
+      }).join("");
+
+      return "<div class=\"view collections-layout\">" +
+        "<aside class=\"panel left\">" +
+          "<div class=\"row-wrap\">" +
+            "<div class=\"section-label\">Season</div>" +
+            "<div style=\"display:flex;gap:4px;flex-wrap:wrap;margin-bottom:10px\">" + filtersSeason + "</div>" +
+            "<div class=\"section-label\">Category</div>" +
+            "<div style=\"display:flex;gap:4px;flex-wrap:wrap\">" + filtersCategory + "</div>" +
+          "</div>" +
+          list +
+        "</aside>" +
+
+        "<section class=\"canvas\">" +
+          "<div style=\"margin-bottom:24px\">" +
+            "<div style=\"display:flex;align-items:baseline;gap:12px;margin-bottom:6px\"><h2 style=\"font-size:24px;font-weight:700;letter-spacing:.02em\">" + escapeHtml(collection.name) + "</h2><div class=\"muted\" style=\"font-size:11px;font-weight:600\">" + collection.season + " · " + collection.category + "</div></div>" +
+            "<div class=\"muted\" style=\"font-size:10px;font-weight:600;letter-spacing:.15em\">" + collection.id + "</div>" +
+          "</div>" +
+          "<div class=\"color-grid-lg\">" + chips + "</div>" +
+          "<div class=\"line-gradient\" style=\"background:linear-gradient(to right, " + collection.colors.map(function (c) { return c.hex; }).join(", ") + ")\"></div>" +
+          "<div style=\"display:flex;gap:8px;flex-wrap:wrap\">" + codes + "</div>" +
+        "</section>" +
+
+        "<aside class=\"panel right\">" +
+          renderDetailPanel(selColor) +
+          (selColor ? "<div><div class=\"section-head\">Trend Tag</div><div style=\"display:flex;gap:5px;flex-wrap:wrap\">" + trendTags + "</div></div>" : "") +
+          "<div><div class=\"section-head\">Notes</div><textarea id=\"global-note\" rows=\"3\" placeholder=\"Add context, observations, references...\">" + escapeHtml(state.note) + "</textarea></div>" +
+          "<button class=\"save-btn" + (state.justSaved ? " done" : "") + "\" data-action=\"save-palette\">" + (state.justSaved ? "✓ Saved" : "Save Collection") + "</button>" +
+        "</aside>" +
+      "</div>";
+    }
+
+    function renderBuildView() {
+      const harmony = getCurrentHarmony();
+      const hsl = hexToHsl(state.customColor);
+
+      const harmonyBtns = HARMONY_MODES.map(function (m) {
+        return "<button class=\"btn-chip" + (state.harmonyMode === m ? " on" : "") + "\" data-action=\"set-harmony-mode\" data-mode=\"" + m + "\">" + m + "</button>";
+      }).join("");
+
+      const chips = harmony.map(function (hex, i) {
+        return renderColorChip({
+          hex: hex,
+          name: state.harmonyMode.slice(0, 4).toUpperCase() + "-" + String(i + 1).padStart(2, "0"),
+          code: "CHR-C" + String(i + 1).padStart(3, "0"),
+        }, {
+          size: "lg",
+          action: "copy-hex",
+          payload: "build-" + i,
+          copyKey: "build-" + i,
+        });
+      }).join("");
+
+      const blocks = harmony.map(function (hex, i) {
+        const rgb = hexToRgb(hex);
+        const cmyk = rgbToCmyk(rgb);
+        return "<div style=\"background:#fff;border:1px solid #efefed;padding:8px 10px;min-width:80px\">" +
+          "<div style=\"width:100%;height:20px;background:" + hex + ";margin-bottom:6px\"></div>" +
+          "<div class=\"mono\" style=\"font-size:9px;color:#999;line-height:1.6\"><div>" + hex.toUpperCase() + "</div><div>RGB " + rgb.r + " " + rgb.g + " " + rgb.b + "</div><div>CMYK " + cmyk.c + " " + cmyk.m + " " + cmyk.y + " " + cmyk.k + "</div></div>" +
+        "</div>";
+      }).join("");
+
+      const trendTags = TREND_TAGS.map(function (t, i) {
+        return "<button class=\"trend-chip" + (state.activeTrend === i ? " on" : "") + "\" data-action=\"toggle-trend\" data-index=\"" + i + "\">" + escapeHtml(t) + "</button>";
+      }).join("");
+
+      return "<div class=\"view build-layout\">" +
+        "<section class=\"canvas\">" +
+          "<div style=\"display:flex;align-items:center;gap:20px;margin-bottom:28px;padding-bottom:20px;border-bottom:1px solid #efefed;flex-wrap:wrap\">" +
+            "<div style=\"display:flex;align-items:center;gap:12px\">" +
+              "<input id=\"custom-color\" type=\"color\" value=\"" + state.customColor + "\">" +
+              "<div><div style=\"font-size:16px;font-weight:700;letter-spacing:.04em\">" + state.customColor.toUpperCase() + "</div><div class=\"mono\" style=\"font-size:11px;color:#999;margin-top:3px\">HSL " + hsl.h + "° " + hsl.s + "% " + hsl.l + "%</div></div>" +
+            "</div>" +
+            "<div style=\"display:flex;gap:6px;margin-left:auto;flex-wrap:wrap\">" + harmonyBtns + "</div>" +
+          "</div>" +
+          "<div class=\"color-grid-5\">" + chips + "</div>" +
+          "<div class=\"line-gradient\" style=\"background:linear-gradient(to right, " + harmony.join(", ") + ")\"></div>" +
+          "<div style=\"display:flex;gap:8px;flex-wrap:wrap\">" + blocks + "</div>" +
+        "</section>" +
+
+        "<aside class=\"panel right\">" +
+          "<div><div class=\"section-head\">Trend Tag</div><div style=\"display:flex;gap:5px;flex-wrap:wrap\">" + trendTags + "</div></div>" +
+          (state.activeTrend !== null ? "<div style=\"font-size:11px;font-weight:600;color:#1a1a1a;letter-spacing:.05em;padding-left:8px;border-left:2px solid #1a1a1a\">" + escapeHtml(TREND_TAGS[state.activeTrend]) + "</div>" : "") +
+          "<div><div class=\"section-head\">Notes</div><textarea id=\"global-note\" rows=\"4\" placeholder=\"Add context, observations, references...\">" + escapeHtml(state.note) + "</textarea></div>" +
+          "<button class=\"save-btn" + (state.justSaved ? " done" : "") + "\" data-action=\"save-palette\">" + (state.justSaved ? "✓ Saved" : "Save Palette") + "</button>" +
+        "</aside>" +
+      "</div>";
+    }
+
+    function renderTrendSwatchArea(tb) {
+      if (tb.boardSwatches.length === 0) {
+        return "<div class=\"empty\"><div><div class=\"section-label\" style=\"margin-bottom:4px;color:#ccc\">No swatches added yet</div><div style=\"font-size:12px;color:#ddd\">Pick colours from the left panel</div></div></div>";
+      }
+
+      if (tb.layout === "Wide Strip") {
+        const top = tb.boardSwatches.map(function (s, i) {
+          return "<div class=\"wide-item\" style=\"background:" + s.hex + "\">" +
+            "<button class=\"icon-btn\" style=\"position:absolute;top:4px;right:4px;border:none;background:rgba(0,0,0,.3);color:#fff\" data-action=\"tb-remove-swatch\" data-index=\"" + i + "\">✕</button>" +
+          "</div>";
+        }).join("");
+
+        const bot = tb.boardSwatches.map(function (s) {
+          return "<div style=\"flex:1;background:#fff;border:1px solid #efefed;padding:4px 5px\"><div style=\"font-size:8px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis\">" + escapeHtml(s.name) + "</div><div class=\"mono\" style=\"font-size:7px;color:#aaa\">" + s.hex.toUpperCase() + "</div></div>";
+        }).join("");
+
+        return "<div style=\"margin-bottom:20px\"><div class=\"wide-strip\">" + top + "</div><div style=\"display:flex;gap:2px\">" + bot + "</div></div>";
+      }
+
+      if (tb.layout === "Chip Grid") {
+        return "<div class=\"swatch-grid\">" + tb.boardSwatches.map(function (s, i) {
+          return "<div class=\"relative\">" +
+            renderColorChip(s, { size: "md", action: "copy-hex", payload: "tb-grid-" + i, copyKey: "tb-grid-" + i }) +
+            "<button class=\"icon-btn remove-btn\" data-action=\"tb-remove-swatch\" data-index=\"" + i + "\">✕</button>" +
+          "</div>";
+        }).join("") + "</div>";
+      }
+
+      if (tb.layout === "Split Panel") {
+        return "<div class=\"split-grid\">" + tb.boardSwatches.slice(0, 6).map(function (s, i) {
+          const fg = getLuminance(s.hex) < 130 ? "#fff" : "#000";
+          return "<div style=\"background:" + s.hex + ";position:relative;display:flex;align-items:flex-end;padding:8px\">" +
+            "<div style=\"font-size:9px;color:" + fg + ";opacity:.75;font-weight:600\">" + escapeHtml(s.name) + "</div>" +
+            "<button style=\"position:absolute;top:6px;right:6px;width:16px;height:16px;border:none;border-radius:50%;background:rgba(0,0,0,.25);color:#fff;cursor:pointer\" data-action=\"tb-remove-swatch\" data-index=\"" + i + "\">✕</button>" +
+          "</div>";
+        }).join("") + "</div>";
+      }
+
+      return "<div style=\"background:#fff;border:1px solid #efefed;padding:20px;margin-bottom:20px\">" +
+        "<div class=\"swatch-grid free\">" + tb.boardSwatches.map(function (s, i) {
+          return "<div class=\"relative\">" +
+            renderColorChip(s, { size: "sm", action: "copy-hex", payload: "tb-free-" + i, copyKey: "tb-free-" + i }) +
+            "<button class=\"icon-btn remove-btn\" data-action=\"tb-remove-swatch\" data-index=\"" + i + "\">✕</button>" +
+          "</div>";
+        }).join("") + "</div>" +
+        (tb.boardSwatches.length ? "<div style=\"height:5px;background:linear-gradient(to right, " + tb.boardSwatches.map(function (s) { return s.hex; }).join(", ") + ");margin-top:16px\"></div>" : "") +
+      "</div>";
+    }
+
+    function renderTrendBoardView() {
+      const tb = state.trendboard;
+
+      const collectionSources = COLLECTIONS.map(function (coll, ci) {
+        const colors = coll.colors.map(function (c, i) {
+          const on = tb.boardSwatches.some(function (s) { return s.hex === c.hex; });
+          return "<div class=\"tb-collection-color" + (on ? " on" : "") + "\" style=\"background:" + c.hex + "\" title=\"Add " + escapeHtml(c.name) + "\" data-action=\"tb-add-collection-color\" data-coll=\"" + ci + "\" data-color=\"" + i + "\"></div>";
+        }).join("");
+
+        return "<div><div class=\"tb-palette-source\"><div style=\"font-size:10px;font-weight:700;color:#555;letter-spacing:.05em\">" + escapeHtml(coll.name) + "</div><div class=\"small-muted\">" + coll.season + " · " + coll.category + "</div></div><div class=\"tb-collection-grid\">" + colors + "</div></div>";
+      }).join("");
+
+      const styleButtons = function (block) {
+        return BOARD_TEXT_STYLES.map(function (st) {
+          return "<button class=\"text-style-btn" + (block.style === st ? " on" : "") + "\" data-action=\"tb-set-text-style\" data-id=\"" + block.id + "\" data-style=\"" + st + "\">" + st + "</button>";
+        }).join("");
+      };
+
+      const textBlocks = tb.textBlocks.map(function (block) {
+        const rows = block.style === "Display" ? 2 : block.style === "Headline" ? 2 : 3;
+        const letter = block.style === "Display" ? "-.01em" : block.style === "Tag" ? ".12em" : "0";
+        const transform = block.style === "Tag" ? "uppercase" : "none";
+        return "<div class=\"text-block\">" +
+          "<div class=\"text-toolbar\"><div class=\"section-label\" style=\"margin:0;font-size:9px\">Style</div><div class=\"h-scroll\">" + styleButtons(block) + "</div><button class=\"icon-btn soft\" data-action=\"tb-remove-text-block\" data-id=\"" + block.id + "\">✕</button></div>" +
+          "<textarea rows=\"" + rows + "\" data-text-id=\"" + block.id + "\" style=\"border:none;padding:0;background:transparent;resize:none;font-size:" + TEXT_SIZES[block.style] + "px;font-weight:" + TEXT_WEIGHTS[block.style] + ";letter-spacing:" + letter + ";text-transform:" + transform + ";line-height:1.4\">" + escapeHtml(block.text) + "</textarea>" +
+        "</div>";
+      }).join("");
+
+      const breakdown = tb.boardSwatches.length ?
+        "<div><div class=\"section-label\">Colour Breakdown</div><div style=\"display:flex;flex-direction:column;gap:6px\">" + tb.boardSwatches.map(function (s) {
+          return "<div style=\"display:flex;align-items:center;gap:8px\"><div style=\"width:24px;height:24px;background:" + s.hex + ";border:1px solid #efefed;flex-shrink:0\"></div><div><div style=\"font-size:10px;font-weight:600;line-height:1.2\">" + escapeHtml(s.name) + "</div><div class=\"mono small-muted\">" + s.hex.toUpperCase() + "</div></div></div>";
+        }).join("") + "</div></div>"
+        : "";
+
+      const recentBoards = tb.boards.length ?
+        "<div><div class=\"section-label\">Recent Boards</div><div style=\"display:flex;flex-direction:column;gap:6px\">" + tb.boards.map(function (b) {
+          return "<div style=\"border:1px solid #efefed;overflow:hidden\"><div style=\"display:flex;height:18px\">" + b.swatches.map(function (s) { return "<div style=\"flex:1;background:" + s.hex + "\"></div>"; }).join("") + "</div><div style=\"padding:5px 7px\"><div style=\"font-size:10px;font-weight:600\">" + escapeHtml(b.title) + "</div><div class=\"small-muted\">" + b.season + " · " + b.swatches.length + " colours</div></div></div>";
+        }).join("") + "</div></div>"
+        : "";
+
+      return "<div class=\"view trendboard-layout\">" +
+        "<aside class=\"panel left\" style=\"display:flex;flex-direction:column\">" +
+          "<div style=\"padding:16px 18px 12px;border-bottom:1px solid #efefed\">" +
+            "<div class=\"section-label\" style=\"margin-bottom:10px\">Add Swatches</div>" +
+            "<div style=\"margin-bottom:14px\">" +
+              "<div class=\"sub-label\" style=\"margin-bottom:7px\">Custom Colour</div>" +
+              "<div style=\"display:flex;gap:8px;align-items:center;margin-bottom:7px\"><input id=\"tb-picker-hex\" type=\"color\" value=\"" + tb.pickerHex + "\" style=\"width:36px;height:36px\"><div><div class=\"mono\" style=\"font-size:11px;font-weight:600\">" + tb.pickerHex.toUpperCase() + "</div><div class=\"mono small-muted\">H" + hexToHsl(tb.pickerHex).h + " S" + hexToHsl(tb.pickerHex).s + " L" + hexToHsl(tb.pickerHex).l + "</div></div></div>" +
+              "<input id=\"tb-picker-name\" type=\"text\" placeholder=\"Colour name (optional)\" value=\"" + escapeHtml(tb.pickerName) + "\">" +
+              "<button style=\"width:100%;margin-top:7px;padding:7px 0;background:#1a1a1a;color:#fff;border:none;cursor:pointer;font-size:10px;font-weight:700;letter-spacing:.12em;opacity:" + (tb.boardSwatches.length >= 12 ? "0.4" : "1") + "\" data-action=\"tb-add-picker\">+ ADD TO BOARD</button>" +
+            "</div>" +
+          "</div>" +
+          "<div style=\"flex:1;overflow:auto\"><div style=\"padding:12px 18px 8px\"><div class=\"sub-label\">From Collections</div></div>" + collectionSources + "</div>" +
+        "</aside>" +
+
+        "<section style=\"background:#f7f7f5;overflow:auto\">" +
+          "<div class=\"tb-header\">" +
+            "<input id=\"tb-title\" type=\"text\" value=\"" + escapeHtml(tb.boardTitle) + "\">" +
+            "<div style=\"display:flex;gap:6px;align-items:center;flex-wrap:wrap\">" +
+              "<select id=\"tb-season\" style=\"font-size:10px;font-weight:600;letter-spacing:.1em;padding:4px 8px;color:#555\">" + BOARD_SEASONS.map(function (s) { return "<option" + (tb.season === s ? " selected" : "") + ">" + s + "</option>"; }).join("") + "</select>" +
+              "<select id=\"tb-category\" style=\"font-size:10px;font-weight:600;letter-spacing:.1em;padding:4px 8px;color:#555\">" + BOARD_CATEGORIES.map(function (c) { return "<option" + (tb.category === c ? " selected" : "") + ">" + c + "</option>"; }).join("") + "</select>" +
+              "<div style=\"display:flex;gap:2px;flex-wrap:wrap\">" + BOARD_LAYOUTS.map(function (l) { return "<button class=\"layout-btn" + (tb.layout === l ? " on" : "") + "\" data-action=\"tb-set-layout\" data-layout=\"" + l + "\">" + l + "</button>"; }).join("") + "</div>" +
+            "</div>" +
+          "</div>" +
+
+          "<div style=\"padding:24px\">" +
+            renderTrendSwatchArea(tb) +
+            "<div class=\"meta-card\" style=\"margin-bottom:16px\"><div class=\"section-label\" style=\"margin-bottom:10px\">Keywords</div><div style=\"display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px\">" + tb.keywords.map(function (kw, i) { return "<span class=\"pill\">" + escapeHtml(kw) + " <button data-action=\"tb-remove-keyword\" data-index=\"" + i + "\">✕</button></span>"; }).join("") + "</div><div style=\"display:flex;gap:6px\"><input id=\"tb-kw-input\" type=\"text\" placeholder=\"Add keyword…\" value=\"" + escapeHtml(tb.kwInput) + "\"><button style=\"padding:5px 12px;background:#1a1a1a;color:#fff;border:none;cursor:pointer;font-size:10px;font-weight:700;letter-spacing:.1em\" data-action=\"tb-add-keyword\">ADD</button></div></div>" +
+            "<div style=\"display:flex;flex-direction:column;gap:10px;margin-bottom:16px\">" + textBlocks + "</div>" +
+            "<button style=\"width:100%;padding:10px 0;border:1.5px dashed #d8d8d8;background:transparent;cursor:pointer;font-size:10px;font-weight:700;letter-spacing:.15em;color:#bbb\" data-action=\"tb-add-text-block\">+ ADD TEXT BLOCK</button>" +
+          "</div>" +
+        "</section>" +
+
+        "<aside class=\"panel right\">" +
+          "<div><div class=\"section-label\" style=\"margin-bottom:10px\">Board Summary</div><div style=\"font-size:13px;font-weight:700;margin-bottom:4px\">" + escapeHtml(tb.boardTitle || "Untitled") + "</div><div class=\"mono small-muted\" style=\"letter-spacing:.06em;margin-bottom:10px\">" + tb.season + " · " + tb.category + "</div>" +
+          (tb.boardSwatches.length ? "<div class=\"tb-summary-strip\">" + tb.boardSwatches.map(function (s) { return "<div style=\"background:" + s.hex + "\"></div>"; }).join("") + "</div>" : "") +
+          "<div style=\"font-size:11px;color:#888\">" + tb.boardSwatches.length + " swatch" + (tb.boardSwatches.length !== 1 ? "es" : "") + " · " + tb.textBlocks.length + " text block" + (tb.textBlocks.length !== 1 ? "s" : "") + "</div></div>" +
+          "<div style=\"height:1px;background:#efefed\"></div>" +
+          breakdown +
+          (tb.boardSwatches.length ? "<div style=\"height:1px;background:#efefed\"></div>" : "") +
+          recentBoards +
+          "<div style=\"margin-top:auto\"><button style=\"width:100%;padding:12px 0;background:" + (tb.savedMsg ? "#2a6a3a" : "#1a1a1a") + ";color:#fff;border:none;cursor:pointer;font-size:11px;font-weight:700;letter-spacing:.15em\" data-action=\"tb-save-board\">" + (tb.savedMsg ? "✓ BOARD SAVED" : "SAVE BOARD") + "</button></div>" +
+        "</aside>" +
+      "</div>";
+    }
+
+    function renderSavedView() {
+      if (state.saved.length === 0) {
+        return "<div class=\"view\" style=\"padding:28px 32px\"><div class=\"saved-empty\"><div class=\"section-label\" style=\"font-size:11px;letter-spacing:.2em;color:#ccc\">No saved palettes yet</div><div style=\"font-size:13px;color:#ddd;margin-top:8px\">Browse collections or build a custom palette to save here.</div></div></div>";
+      }
+
+      const cards = state.saved.map(function (p) {
+        const cols = p.colors.length;
+        const strips = p.colors.map(function (c, ci) {
+          return "<div style=\"display:flex;flex-direction:column\"><div style=\"flex:1;background:" + c.hex + "\"></div><div style=\"height:22px;background:#fff;display:flex;align-items:center;justify-content:center;border-right:" + (ci < cols - 1 ? "1px solid #f5f5f5" : "none") + "\"><div class=\"mono\" style=\"font-size:7px;color:#ccc;letter-spacing:.04em\">" + c.hex.toUpperCase().slice(1) + "</div></div></div>";
+        }).join("");
+
+        return "<div class=\"saved-card\">" +
+          "<div class=\"saved-strip\" style=\"grid-template-columns:repeat(" + cols + ",1fr)\">" + strips + "</div>" +
+          "<div class=\"saved-footer\"><div style=\"display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px\"><div style=\"font-size:14px;font-weight:700\">" + escapeHtml(p.name) + "</div><div class=\"mono\" style=\"font-size:9px;color:#bbb;letter-spacing:.08em\">" + escapeHtml(p.id) + "</div></div>" +
+          (p.trend ? "<div style=\"display:inline-block;font-size:9px;font-weight:700;letter-spacing:.12em;color:#fff;background:#1a1a1a;padding:2px 8px;margin-bottom:6px;text-transform:uppercase\">" + escapeHtml(p.trend) + "</div>" : "") +
+          (p.note ? "<div style=\"font-size:12px;color:#888;line-height:1.55\">" + escapeHtml(p.note) + "</div>" : "") +
+          "</div>" +
+        "</div>";
+      }).join("");
+
+      return "<div class=\"view\" style=\"padding:28px 32px\">" +
+        "<div style=\"display:flex;align-items:baseline;gap:10px;margin-bottom:24px;padding-bottom:16px;border-bottom:1px solid #efefed\"><h2 style=\"font-size:20px;font-weight:700;letter-spacing:.04em\">Saved Palettes</h2><div class=\"muted\" style=\"font-size:11px;font-weight:600;letter-spacing:.1em\">" + state.saved.length + " " + (state.saved.length === 1 ? "palette" : "palettes") + "</div></div>" +
+        "<div class=\"saved-grid\">" + cards + "</div>" +
+      "</div>";
+    }
+
+    function renderHeader() {
+      const tabs = [
+        { id: "collections", label: "Collections" },
+        { id: "build", label: "Build" },
+        { id: "trendboard", label: "Trend Board" },
+        { id: "saved", label: "Saved (" + state.saved.length + ")" },
+      ];
+
+      return "<header class=\"topbar\">" +
+        "<div class=\"brand-wrap\"><div class=\"brand\"><div class=\"brand-bars\"><span style=\"background:#E87820\"></span><span style=\"background:#3D6E8A\"></span><span style=\"background:#7A9070\"></span><span style=\"background:#C84820\"></span><span style=\"background:#3A4070\"></span></div><div><div class=\"brand-title\">CHROMA</div><div class=\"brand-sub\">COLOUR INTELLIGENCE</div></div></div></div>" +
+        "<nav class=\"tabs\">" + tabs.map(function (t) { return "<button class=\"tab" + (state.tab === t.id ? " on" : "") + "\" data-action=\"switch-tab\" data-tab=\"" + t.id + "\">" + t.label + "</button>"; }).join("") + "</nav>" +
+        "<div class=\"season-badge-wrap\"><div class=\"season-badge\">SS · AW 2026</div></div>" +
+      "</header>";
+    }
+
+    function renderView() {
+      if (state.tab === "collections") return renderCollectionsView();
+      if (state.tab === "build") return renderBuildView();
+      if (state.tab === "trendboard") return renderTrendBoardView();
+      return renderSavedView();
+    }
+
+    function render(opts) {
+      const preserve = opts && opts.preserveFocus;
+      const focus = preserve ? captureFocus() : null;
+      document.getElementById("app").innerHTML = renderHeader() + renderView();
+      if (focus) restoreFocus(focus);
+    }
+
+    function savePalette() {
+      const coll = getCurrentCollection();
+      const harmony = getCurrentHarmony();
+      const payload = state.tab === "collections"
+        ? {
+            name: coll.name,
+            id: coll.id,
+            colors: coll.colors,
+            trend: state.activeTrend !== null ? TREND_TAGS[state.activeTrend] : null,
+            note: state.note,
+          }
+        : {
+            name: "Custom · " + state.harmonyMode,
+            id: "CUSTOM-" + Date.now(),
+            colors: harmony.map(function (hex, i) {
+              return { hex: hex, name: hex, code: "CHR-C" + (i + 1) + "00" };
+            }),
+            trend: state.activeTrend !== null ? TREND_TAGS[state.activeTrend] : null,
+            note: state.note,
+          };
+
+      state.saved = [payload].concat(state.saved.slice(0, 11));
+      state.justSaved = true;
+      clearTimeout(saveTimer);
+      saveTimer = setTimeout(function () {
+        state.justSaved = false;
+        render();
+      }, 1800);
+      render();
+    }
+
+    function handleAction(actionEl) {
+      const action = actionEl.dataset.action;
+      if (!action) return;
+
+      if (action === "switch-tab") {
+        state.tab = actionEl.dataset.tab;
+        render();
+        return;
+      }
+
+      if (action === "set-season-filter") {
+        state.seasonFilter = actionEl.dataset.value;
+        state.selectedChip = null;
+        render();
+        return;
+      }
+
+      if (action === "set-category-filter") {
+        state.categoryFilter = actionEl.dataset.value;
+        state.selectedChip = null;
+        render();
+        return;
+      }
+
+      if (action === "select-collection") {
+        state.selectedCollection = Number(actionEl.dataset.index);
+        state.selectedChip = null;
+        render();
+        return;
+      }
+
+      if (action === "select-chip") {
+        const idx = Number(actionEl.dataset.payload);
+        state.selectedChip = state.selectedChip === idx ? null : idx;
+        copyHex(actionEl.dataset.hex, actionEl.dataset.copyKey);
+        return;
+      }
+
+      if (action === "copy-hex") {
+        copyHex(actionEl.dataset.hex, actionEl.dataset.copyKey || actionEl.dataset.payload || actionEl.dataset.hex);
+        return;
+      }
+
+      if (action === "toggle-trend") {
+        const i = Number(actionEl.dataset.index);
+        state.activeTrend = state.activeTrend === i ? null : i;
+        render();
+        return;
+      }
+
+      if (action === "set-harmony-mode") {
+        state.harmonyMode = actionEl.dataset.mode;
+        render();
+        return;
+      }
+
+      if (action === "save-palette") {
+        savePalette();
+        return;
+      }
+
+      if (action === "tb-add-picker") {
+        const tb = state.trendboard;
+        if (tb.boardSwatches.length >= 12) return;
+        tb.boardSwatches.push({
+          hex: tb.pickerHex,
+          name: tb.pickerName || tb.pickerHex.toUpperCase(),
+          code: "CHR-B" + String(tb.nextId++).padStart(3, "0"),
+        });
+        render();
+        return;
+      }
+
+      if (action === "tb-add-collection-color") {
+        const tb = state.trendboard;
+        if (tb.boardSwatches.length >= 12) return;
+        const coll = COLLECTIONS[Number(actionEl.dataset.coll)];
+        const color = coll.colors[Number(actionEl.dataset.color)];
+        if (tb.boardSwatches.some(function (s) { return s.hex === color.hex; })) return;
+        tb.boardSwatches.push({ hex: color.hex, name: color.name, code: color.code });
+        render();
+        return;
+      }
+
+      if (action === "tb-remove-swatch") {
+        const tb = state.trendboard;
+        const idx = Number(actionEl.dataset.index);
+        tb.boardSwatches = tb.boardSwatches.filter(function (_, i) { return i !== idx; });
+        render();
+        return;
+      }
+
+      if (action === "tb-set-layout") {
+        state.trendboard.layout = actionEl.dataset.layout;
+        render();
+        return;
+      }
+
+      if (action === "tb-remove-keyword") {
+        const idx = Number(actionEl.dataset.index);
+        state.trendboard.keywords = state.trendboard.keywords.filter(function (_, i) { return i !== idx; });
+        render();
+        return;
+      }
+
+      if (action === "tb-add-keyword") {
+        const tb = state.trendboard;
+        const kw = tb.kwInput.trim();
+        if (kw && !tb.keywords.includes(kw)) {
+          tb.keywords.push(kw);
+          tb.kwInput = "";
+          render();
+        }
+        return;
+      }
+
+      if (action === "tb-add-text-block") {
+        const tb = state.trendboard;
+        tb.textBlocks.push({ id: tb.nextId++, style: "Body", text: "New text block..." });
+        render();
+        return;
+      }
+
+      if (action === "tb-remove-text-block") {
+        const id = Number(actionEl.dataset.id);
+        state.trendboard.textBlocks = state.trendboard.textBlocks.filter(function (b) { return b.id !== id; });
+        render();
+        return;
+      }
+
+      if (action === "tb-set-text-style") {
+        const id = Number(actionEl.dataset.id);
+        const style = actionEl.dataset.style;
+        state.trendboard.textBlocks = state.trendboard.textBlocks.map(function (b) {
+          return b.id === id ? { id: b.id, style: style, text: b.text } : b;
+        });
+        render();
+        return;
+      }
+
+      if (action === "tb-save-board") {
+        const tb = state.trendboard;
+        tb.boards = [{
+          title: tb.boardTitle,
+          season: tb.season,
+          category: tb.category,
+          swatches: tb.boardSwatches.slice(),
+          texts: tb.textBlocks.slice(),
+          keywords: tb.keywords.slice(),
+          layout: tb.layout,
+          ts: Date.now(),
+        }].concat(tb.boards.slice(0, 5));
+        tb.savedMsg = true;
+        clearTimeout(boardSavedTimer);
+        boardSavedTimer = setTimeout(function () {
+          tb.savedMsg = false;
+          render();
+        }, 1800);
+        render();
+      }
+    }
+
+    function handleInput(target) {
+      if (target.id === "global-note") {
+        state.note = target.value;
+        return;
+      }
+
+      if (target.id === "custom-color") {
+        state.customColor = target.value;
+        render({ preserveFocus: true });
+        return;
+      }
+
+      if (target.id === "tb-title") {
+        state.trendboard.boardTitle = target.value;
+        render({ preserveFocus: true });
+        return;
+      }
+
+      if (target.id === "tb-season") {
+        state.trendboard.season = target.value;
+        render();
+        return;
+      }
+
+      if (target.id === "tb-category") {
+        state.trendboard.category = target.value;
+        render();
+        return;
+      }
+
+      if (target.id === "tb-picker-hex") {
+        state.trendboard.pickerHex = target.value;
+        render({ preserveFocus: true });
+        return;
+      }
+
+      if (target.id === "tb-picker-name") {
+        state.trendboard.pickerName = target.value;
+        return;
+      }
+
+      if (target.id === "tb-kw-input") {
+        state.trendboard.kwInput = target.value;
+        return;
+      }
+
+      if (target.dataset.textId) {
+        const id = Number(target.dataset.textId);
+        state.trendboard.textBlocks = state.trendboard.textBlocks.map(function (b) {
+          return b.id === id ? { id: b.id, style: b.style, text: target.value } : b;
+        });
+      }
+    }
+
+    document.addEventListener("click", function (e) {
+      const actionEl = e.target.closest("[data-action]");
+      if (!actionEl) return;
+      handleAction(actionEl);
+    });
+
+    document.addEventListener("input", function (e) {
+      handleInput(e.target);
+    });
+
+    document.addEventListener("change", function (e) {
+      handleInput(e.target);
+    });
+
+    document.addEventListener("keydown", function (e) {
+      if (e.key === "Enter" && e.target && e.target.id === "tb-kw-input") {
+        e.preventDefault();
+        const tb = state.trendboard;
+        const kw = tb.kwInput.trim();
+        if (kw && !tb.keywords.includes(kw)) {
+          tb.keywords.push(kw);
+          tb.kwInput = "";
+          render();
+        }
+      }
+    });
+
+    render();
+  </script>
+</body>
+</html>
