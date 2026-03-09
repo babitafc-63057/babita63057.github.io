@@ -1,0 +1,1549 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UNDERCURRENT — App Wireframes</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@300;400;500&family=Syne:wght@300;400;500;600;700&display=swap');
+
+  :root {
+    --bg: #070709;
+    --surface: #0d0d12;
+    --surface2: #131318;
+    --border: rgba(255,255,255,0.07);
+    --accent: #7CFFD4;
+    --accent2: #FF6B6B;
+    --accent3: #A78BFA;
+    --text: #F0EEE8;
+    --muted: rgba(240,238,232,0.45);
+    --phone-w: 320px;
+    --phone-h: 660px;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Syne', sans-serif;
+    min-height: 100vh;
+    padding: 60px 40px;
+    overflow-x: hidden;
+  }
+
+  /* noise overlay */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 9999;
+    opacity: 0.6;
+  }
+
+  header {
+    text-align: center;
+    margin-bottom: 70px;
+  }
+
+  header .label {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.3em;
+    color: var(--accent);
+    text-transform: uppercase;
+    margin-bottom: 16px;
+  }
+
+  header h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 56px;
+    font-weight: 400;
+    letter-spacing: -0.02em;
+    line-height: 1;
+    margin-bottom: 12px;
+  }
+
+  header h1 em {
+    font-style: italic;
+    color: var(--accent);
+  }
+
+  header p {
+    font-size: 14px;
+    color: var(--muted);
+    font-weight: 300;
+    letter-spacing: 0.04em;
+  }
+
+  /* Section label */
+  .section-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.35em;
+    color: var(--muted);
+    text-transform: uppercase;
+    margin-bottom: 32px;
+    margin-top: 80px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .section-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  /* Phone grid */
+  .phones-row {
+    display: flex;
+    gap: 28px;
+    justify-content: center;
+    flex-wrap: wrap;
+    align-items: flex-start;
+  }
+
+  /* Phone shell */
+  .phone {
+    width: var(--phone-w);
+    flex-shrink: 0;
+  }
+
+  .phone-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    color: var(--muted);
+    text-transform: uppercase;
+    text-align: center;
+    margin-bottom: 12px;
+  }
+
+  .phone-shell {
+    width: var(--phone-w);
+    height: var(--phone-h);
+    background: #0A0A0F;
+    border-radius: 44px;
+    border: 1.5px solid rgba(255,255,255,0.12);
+    overflow: hidden;
+    position: relative;
+    box-shadow:
+      0 0 0 1px rgba(0,0,0,0.8),
+      0 40px 80px rgba(0,0,0,0.7),
+      inset 0 1px 0 rgba(255,255,255,0.08);
+  }
+
+  /* Notch */
+  .notch {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100px;
+    height: 28px;
+    background: #0A0A0F;
+    border-radius: 0 0 18px 18px;
+    z-index: 100;
+    border: 1.5px solid rgba(255,255,255,0.1);
+    border-top: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+  }
+  .notch .cam { width: 8px; height: 8px; border-radius: 50%; background: #1a1a22; border: 1px solid rgba(255,255,255,0.1); }
+  .notch .pill { width: 28px; height: 4px; border-radius: 2px; background: #1a1a22; }
+
+  .screen {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* ─── SCREEN 1: ONBOARDING / SPLASH ─── */
+  .s-splash {
+    background: radial-gradient(ellipse 60% 50% at 50% 40%, rgba(124,255,212,0.08) 0%, transparent 70%), #070709;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 28px 40px;
+    gap: 0;
+  }
+
+  .splash-rings {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -58%);
+  }
+
+  .splash-rings svg { overflow: visible; }
+
+  .splash-content {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+    margin-top: 160px;
+  }
+
+  .splash-brand {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.4em;
+    color: var(--accent);
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+
+  .splash-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 32px;
+    font-weight: 400;
+    line-height: 1.1;
+    margin-bottom: 14px;
+  }
+
+  .splash-sub {
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 1.6;
+    font-weight: 300;
+    margin-bottom: 40px;
+  }
+
+  .btn-primary {
+    width: 100%;
+    padding: 14px;
+    background: var(--accent);
+    color: #070709;
+    border-radius: 14px;
+    font-family: 'Syne', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-align: center;
+    margin-bottom: 12px;
+  }
+
+  .btn-ghost {
+    width: 100%;
+    padding: 14px;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    border-radius: 14px;
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-align: center;
+  }
+
+  /* ─── SCREEN 2: LIVE SENSING DASHBOARD ─── */
+  .s-live {
+    background: #07070A;
+    display: flex;
+    flex-direction: column;
+    padding: 44px 20px 24px;
+    gap: 14px;
+  }
+
+  .status-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+    padding: 0 4px;
+  }
+
+  .nav-label {
+    font-family: 'DM Serif Display', serif;
+    font-size: 22px;
+    font-weight: 400;
+    padding: 0 4px;
+  }
+
+  .live-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    background: rgba(124,255,212,0.1);
+    border: 1px solid rgba(124,255,212,0.2);
+    border-radius: 20px;
+    padding: 4px 10px;
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    color: var(--accent);
+    letter-spacing: 0.15em;
+    margin-bottom: 4px;
+  }
+
+  .live-dot {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--accent);
+    animation: pulse-dot 1.5s ease-in-out infinite;
+  }
+
+  @keyframes pulse-dot {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.4; transform: scale(0.7); }
+  }
+
+  /* Central signal orb */
+  .signal-orb-wrap {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 8px 0;
+  }
+
+  .signal-orb {
+    width: 160px;
+    height: 160px;
+    border-radius: 50%;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .orb-ring {
+    position: absolute;
+    border-radius: 50%;
+    border: 1px solid rgba(124,255,212,0.15);
+  }
+
+  .orb-r1 { width: 160px; height: 160px; }
+  .orb-r2 { width: 128px; height: 128px; }
+  .orb-r3 { width: 96px; height: 96px; border-color: rgba(124,255,212,0.25); }
+
+  .orb-core {
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(124,255,212,0.25) 0%, rgba(124,255,212,0.05) 60%, transparent 100%);
+    border: 1px solid rgba(124,255,212,0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .orb-val {
+    font-family: 'DM Serif Display', serif;
+    font-size: 22px;
+    color: var(--accent);
+    line-height: 1;
+  }
+
+  .orb-unit {
+    font-family: 'DM Mono', monospace;
+    font-size: 8px;
+    color: var(--muted);
+    letter-spacing: 0.15em;
+  }
+
+  /* Signal cards row */
+  .signal-cards {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+
+  .sig-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 14px;
+  }
+
+  .sig-icon {
+    font-size: 16px;
+    margin-bottom: 8px;
+  }
+
+  .sig-name {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.15em;
+    color: var(--muted);
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+
+  .sig-val {
+    font-family: 'DM Serif Display', serif;
+    font-size: 20px;
+    color: var(--text);
+    margin-bottom: 6px;
+  }
+
+  .sig-bar {
+    height: 3px;
+    background: var(--surface2);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+
+  .sig-fill {
+    height: 100%;
+    border-radius: 2px;
+    background: var(--accent);
+  }
+
+  .sig-fill.warn { background: #FBBF24; }
+  .sig-fill.alert { background: var(--accent2); }
+  .sig-fill.calm { background: var(--accent3); }
+
+  /* Waveform */
+  .waveform-row {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 14px;
+  }
+
+  .waveform-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.15em;
+    color: var(--muted);
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+
+  /* ─── SCREEN 3: SIGNAL TIMELINE ─── */
+  .s-timeline {
+    background: #07070A;
+    padding: 44px 20px 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .date-chip {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.2em;
+    color: var(--muted);
+    background: var(--surface2);
+    border-radius: 20px;
+    padding: 4px 12px;
+    display: inline-flex;
+    width: fit-content;
+  }
+
+  .timeline-chart {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    padding: 16px 16px 10px;
+  }
+
+  .timeline-events {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 4px;
+  }
+
+  .t-event {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .t-time {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+    width: 38px;
+    flex-shrink: 0;
+  }
+
+  .t-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .t-line-wrap {
+    flex: 1;
+  }
+
+  .t-title {
+    font-size: 12px;
+    font-weight: 500;
+    margin-bottom: 2px;
+  }
+
+  .t-sub {
+    font-size: 10px;
+    color: var(--muted);
+    font-weight: 300;
+  }
+
+  .t-bar-outer {
+    height: 4px;
+    background: var(--surface2);
+    border-radius: 2px;
+    margin-top: 6px;
+    overflow: hidden;
+  }
+
+  .t-bar-inner {
+    height: 100%;
+    border-radius: 2px;
+  }
+
+  /* Signal legend row */
+  .legend-row {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    color: var(--muted);
+    letter-spacing: 0.1em;
+  }
+
+  .legend-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+  }
+
+  /* Pattern insight card */
+  .insight-card {
+    background: linear-gradient(135deg, rgba(124,255,212,0.06) 0%, rgba(124,255,212,0.02) 100%);
+    border: 1px solid rgba(124,255,212,0.18);
+    border-radius: 16px;
+    padding: 16px;
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+  }
+
+  .insight-icon {
+    font-size: 18px;
+    margin-top: 2px;
+  }
+
+  .insight-title {
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+
+  .insight-body {
+    font-size: 11px;
+    color: var(--muted);
+    line-height: 1.6;
+    font-weight: 300;
+  }
+
+  /* ─── SCREEN 4: TRAINING ─── */
+  .s-train {
+    background: #07070A;
+    padding: 44px 20px 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .progress-ring-wrap {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    gap: 8px;
+    padding: 10px 0;
+  }
+
+  .stage-pills {
+    display: flex;
+    gap: 6px;
+    justify-content: center;
+  }
+
+  .stage-pill {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.1em;
+    padding: 5px 10px;
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    color: var(--muted);
+  }
+
+  .stage-pill.active {
+    background: rgba(124,255,212,0.12);
+    border-color: rgba(124,255,212,0.3);
+    color: var(--accent);
+  }
+
+  .stage-pill.done {
+    background: rgba(124,255,212,0.06);
+    border-color: rgba(124,255,212,0.15);
+    color: rgba(124,255,212,0.5);
+  }
+
+  .exercise-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    padding: 18px;
+  }
+
+  .ex-tag {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.2em;
+    color: var(--accent3);
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+
+  .ex-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 18px;
+    font-weight: 400;
+    margin-bottom: 8px;
+    line-height: 1.2;
+  }
+
+  .ex-desc {
+    font-size: 11px;
+    color: var(--muted);
+    line-height: 1.6;
+    font-weight: 300;
+    margin-bottom: 14px;
+  }
+
+  .ex-steps {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-bottom: 14px;
+  }
+
+  .ex-step {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    font-size: 11px;
+    color: var(--muted);
+    font-weight: 300;
+  }
+
+  .ex-num {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    color: var(--accent3);
+    background: rgba(167,139,250,0.1);
+    border-radius: 50%;
+    width: 16px;
+    height: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  .btn-start {
+    width: 100%;
+    padding: 13px;
+    background: var(--accent3);
+    color: #070709;
+    border-radius: 12px;
+    font-family: 'Syne', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    text-align: center;
+    letter-spacing: 0.05em;
+  }
+
+  .score-strip {
+    display: flex;
+    gap: 8px;
+  }
+
+  .score-tile {
+    flex: 1;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 12px;
+    text-align: center;
+  }
+
+  .score-num {
+    font-family: 'DM Serif Display', serif;
+    font-size: 22px;
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+
+  .score-lbl {
+    font-family: 'DM Mono', monospace;
+    font-size: 8px;
+    letter-spacing: 0.15em;
+    color: var(--muted);
+    text-transform: uppercase;
+  }
+
+  /* ─── SCREEN 5: REFLECTION JOURNAL ─── */
+  .s-reflect {
+    background: #07070A;
+    padding: 44px 20px 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .journal-entry {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 16px;
+  }
+
+  .journal-date {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    color: var(--muted);
+    letter-spacing: 0.2em;
+    margin-bottom: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .journal-tag {
+    display: inline-flex;
+    gap: 4px;
+    align-items: center;
+    font-size: 9px;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-family: 'DM Mono', monospace;
+  }
+
+  .journal-body {
+    font-size: 12px;
+    line-height: 1.7;
+    color: rgba(240,238,232,0.8);
+    font-weight: 300;
+    font-family: 'DM Serif Display', serif;
+    font-style: italic;
+    margin-bottom: 12px;
+  }
+
+  .journal-signals {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .j-sig {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    color: var(--muted);
+    background: var(--surface2);
+    padding: 3px 8px;
+    border-radius: 8px;
+  }
+
+  .add-entry {
+    border: 1px dashed rgba(255,255,255,0.12);
+    border-radius: 16px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    color: var(--muted);
+  }
+
+  .add-plus {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    color: var(--muted);
+  }
+
+  .add-label {
+    font-size: 12px;
+    font-weight: 300;
+  }
+
+  /* ─── BOTTOM NAV ─── */
+  .bottom-nav {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 70px;
+    background: rgba(7,7,10,0.95);
+    border-top: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    padding: 0 10px 10px;
+    backdrop-filter: blur(12px);
+  }
+
+  .nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    padding: 8px 12px;
+    border-radius: 12px;
+  }
+
+  .nav-item.active { background: rgba(124,255,212,0.07); }
+
+  .nav-ico { font-size: 16px; }
+  .nav-txt {
+    font-family: 'DM Mono', monospace;
+    font-size: 8px;
+    letter-spacing: 0.12em;
+    color: var(--muted);
+  }
+  .nav-item.active .nav-txt { color: var(--accent); }
+
+  /* ─── SVG WAVE ─── */
+  .wave-svg {
+    width: 100%;
+    height: 40px;
+  }
+
+  /* ─── HEATMAP ─── */
+  .heatmap-row {
+    display: flex;
+    gap: 3px;
+    justify-content: center;
+    padding: 4px 0;
+  }
+
+  .hm-day {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    align-items: center;
+  }
+
+  .hm-cell {
+    width: 22px;
+    height: 22px;
+    border-radius: 5px;
+    background: var(--surface2);
+  }
+
+  .hm-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 7px;
+    color: var(--muted);
+    letter-spacing: 0.05em;
+  }
+
+  /* ─── BODY MAP ─── */
+  .s-bodymap {
+    background: #07070A;
+    padding: 44px 20px 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  /* Connector lines between screens */
+  .flow-arrow {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 0 4px;
+    color: var(--muted);
+    flex-shrink: 0;
+    align-self: center;
+    margin-top: -60px;
+  }
+
+  .flow-arrow span {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.15em;
+    color: var(--muted);
+    writing-mode: vertical-rl;
+    text-orientation: mixed;
+    transform: rotate(180deg);
+    margin: 8px 0;
+  }
+
+  /* Footer */
+  footer {
+    text-align: center;
+    margin-top: 100px;
+    padding-bottom: 60px;
+  }
+
+  footer .f-brand {
+    font-family: 'DM Serif Display', serif;
+    font-size: 28px;
+    font-weight: 400;
+    color: var(--muted);
+    margin-bottom: 12px;
+  }
+
+  footer .f-tagline {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.25em;
+    color: rgba(124,255,212,0.4);
+    text-transform: uppercase;
+  }
+
+  .divider-line {
+    height: 1px;
+    background: var(--border);
+    margin: 60px 0 0;
+  }
+
+  /* Pattern overview */
+  .pattern-overview {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    padding: 18px;
+  }
+
+  .po-title {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.2em;
+    color: var(--muted);
+    text-transform: uppercase;
+    margin-bottom: 16px;
+  }
+
+  .po-bars {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .po-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .po-lbl {
+    font-size: 10px;
+    color: var(--muted);
+    font-weight: 300;
+    width: 64px;
+    flex-shrink: 0;
+  }
+
+  .po-bar {
+    flex: 1;
+    height: 6px;
+    background: var(--surface2);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+
+  .po-fill {
+    height: 100%;
+    border-radius: 3px;
+    background: var(--accent);
+  }
+
+  .po-val {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    color: var(--muted);
+    width: 28px;
+    text-align: right;
+    flex-shrink: 0;
+  }
+
+</style>
+</head>
+<body>
+
+<header>
+  <div class="label">FigBuild 2026 — Wireframes</div>
+  <h1>Under<em>current</em></h1>
+  <p>Mobile App — 5 Key Screens · Detect · Train · Reflect</p>
+</header>
+
+<!-- ═══════════════════════════════════════════════ -->
+<!-- ROW 1: ONBOARDING + LIVE SENSING -->
+<!-- ═══════════════════════════════════════════════ -->
+
+<div class="section-label">01 — Onboarding & Live Sensing</div>
+
+<div class="phones-row">
+
+  <!-- SCREEN 1: SPLASH -->
+  <div class="phone">
+    <div class="phone-label">01 · Welcome</div>
+    <div class="phone-shell">
+      <div class="notch"><div class="cam"></div><div class="pill"></div></div>
+      <div class="screen s-splash">
+        <!-- Rings -->
+        <div class="splash-rings">
+          <svg width="260" height="260" viewBox="0 0 260 260">
+            <circle cx="130" cy="130" r="120" fill="none" stroke="rgba(124,255,212,0.06)" stroke-width="1"/>
+            <circle cx="130" cy="130" r="90" fill="none" stroke="rgba(124,255,212,0.09)" stroke-width="1"/>
+            <circle cx="130" cy="130" r="60" fill="none" stroke="rgba(124,255,212,0.14)" stroke-width="1"/>
+            <circle cx="130" cy="130" r="30" fill="none" stroke="rgba(124,255,212,0.22)" stroke-width="1"/>
+            <!-- signal lines -->
+            <line x1="130" y1="10" x2="130" y2="50" stroke="rgba(124,255,212,0.3)" stroke-width="1.5" stroke-linecap="round"/>
+            <line x1="250" y1="130" x2="210" y2="130" stroke="rgba(124,255,212,0.2)" stroke-width="1"/>
+            <line x1="10" y1="130" x2="50" y2="130" stroke="rgba(124,255,212,0.2)" stroke-width="1"/>
+            <!-- center glow -->
+            <circle cx="130" cy="130" r="16" fill="rgba(124,255,212,0.12)"/>
+            <circle cx="130" cy="130" r="8" fill="rgba(124,255,212,0.3)"/>
+            <!-- subtle signal marks -->
+            <circle cx="130" cy="40" r="3" fill="rgba(124,255,212,0.5)"/>
+            <circle cx="220" cy="130" r="2" fill="rgba(124,255,212,0.35)"/>
+          </svg>
+        </div>
+
+        <div class="splash-content">
+          <div class="splash-brand">Undercurrent</div>
+          <div class="splash-title">Feel what you<br>stopped noticing</div>
+          <div class="splash-sub">A wearable system that reflects your body's signals back to you — rebuilding the sense you never knew you'd lost.</div>
+          <div class="btn-primary">Begin Calibration</div>
+          <div class="btn-ghost">I already have a device</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCREEN 2: LIVE SENSING -->
+  <div class="phone">
+    <div class="phone-label">02 · Live Sensing</div>
+    <div class="phone-shell">
+      <div class="notch"><div class="cam"></div><div class="pill"></div></div>
+      <div class="screen s-live">
+        <div class="status-bar">
+          <span>09:41</span>
+          <span>● ● ●</span>
+        </div>
+
+        <div>
+          <div class="live-badge"><span class="live-dot"></span>SENSING LIVE</div>
+          <div class="nav-label">Now</div>
+        </div>
+
+        <!-- Central orb -->
+        <div class="signal-orb-wrap">
+          <div class="signal-orb">
+            <div class="orb-ring orb-r1"></div>
+            <div class="orb-ring orb-r2"></div>
+            <div class="orb-ring orb-r3"></div>
+            <div class="orb-core">
+              <div class="orb-val">72</div>
+              <div class="orb-unit">HRV</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 4 signal cards -->
+        <div class="signal-cards">
+          <div class="sig-card">
+            <div class="sig-icon">💓</div>
+            <div class="sig-name">Heart Rate</div>
+            <div class="sig-val">68</div>
+            <div class="sig-bar"><div class="sig-fill calm" style="width:55%"></div></div>
+          </div>
+          <div class="sig-card">
+            <div class="sig-icon">🫁</div>
+            <div class="sig-name">Breath</div>
+            <div class="sig-val">16</div>
+            <div class="sig-bar"><div class="sig-fill" style="width:40%"></div></div>
+          </div>
+          <div class="sig-card">
+            <div class="sig-icon">⚡</div>
+            <div class="sig-name">Stress</div>
+            <div class="sig-val">3.2</div>
+            <div class="sig-bar"><div class="sig-fill warn" style="width:32%"></div></div>
+          </div>
+          <div class="sig-card">
+            <div class="sig-icon">🌡</div>
+            <div class="sig-name">Skin Temp</div>
+            <div class="sig-val">36.2°</div>
+            <div class="sig-bar"><div class="sig-fill" style="width:70%"></div></div>
+          </div>
+        </div>
+
+        <!-- Waveform -->
+        <div class="waveform-row">
+          <div class="waveform-label">HRV Signal</div>
+          <svg class="wave-svg" viewBox="0 0 280 40">
+            <path d="M0,20 Q10,20 14,20 L18,4 L22,34 L26,14 L30,24 L34,20 Q44,20 48,20 L52,8 L56,30 L60,16 L64,22 L68,20 Q78,20 82,20 L86,6 L90,32 L94,12 L98,26 L102,20 Q112,20 116,20 L120,10 L124,28 L128,15 L132,23 L136,20 Q146,20 150,20 L154,7 L158,31 L162,13 L166,25 L170,20 Q180,20 184,20 L188,9 L192,29 L196,16 L200,22 L204,20 Q214,20 218,20 L222,11 L226,27 L230,17 L234,21 L238,20 Q248,20 252,20 L256,8 L260,30 L264,15 L268,23 L272,20 L280,20" fill="none" stroke="rgba(124,255,212,0.6)" stroke-width="1.5"/>
+          </svg>
+        </div>
+
+        <div style="height:70px"></div><!-- nav spacer -->
+
+        <div class="bottom-nav">
+          <div class="nav-item active"><div class="nav-ico">◎</div><div class="nav-txt">SENSE</div></div>
+          <div class="nav-item"><div class="nav-ico">◈</div><div class="nav-txt">TIMELINE</div></div>
+          <div class="nav-item"><div class="nav-ico">◇</div><div class="nav-txt">TRAIN</div></div>
+          <div class="nav-item"><div class="nav-ico">◻</div><div class="nav-txt">REFLECT</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ═══════════════════════════════════════════════ -->
+<!-- ROW 2: TIMELINE + TRAINING -->
+<!-- ═══════════════════════════════════════════════ -->
+
+<div class="section-label">02 — Signal Timeline & Training</div>
+
+<div class="phones-row">
+
+  <!-- SCREEN 3: SIGNAL TIMELINE -->
+  <div class="phone">
+    <div class="phone-label">03 · Signal Timeline</div>
+    <div class="phone-shell">
+      <div class="notch"><div class="cam"></div><div class="pill"></div></div>
+      <div class="screen s-timeline">
+        <div class="status-bar">
+          <span>09:41</span>
+          <span>● ● ●</span>
+        </div>
+
+        <div>
+          <div class="date-chip">MON · 09 MAR 2026</div>
+          <div class="nav-label" style="margin-top:8px">Timeline</div>
+        </div>
+
+        <!-- Heatmap -->
+        <div class="timeline-chart">
+          <div class="waveform-label">Signal Intensity — Today</div>
+          <svg viewBox="0 0 280 52" width="100%" height="52">
+            <!-- time ticks -->
+            <text x="0" y="50" font-family="monospace" font-size="7" fill="rgba(255,255,255,0.3)">6AM</text>
+            <text x="60" y="50" font-family="monospace" font-size="7" fill="rgba(255,255,255,0.3)">9AM</text>
+            <text x="120" y="50" font-family="monospace" font-size="7" fill="rgba(255,255,255,0.3)">12PM</text>
+            <text x="180" y="50" font-family="monospace" font-size="7" fill="rgba(255,255,255,0.3)">3PM</text>
+            <text x="240" y="50" font-family="monospace" font-size="7" fill="rgba(255,255,255,0.3)">6PM</text>
+            <!-- calm baseline -->
+            <path d="M0,30 Q20,28 40,30 Q60,32 80,30 Q100,28 120,26" fill="none" stroke="rgba(124,255,212,0.35)" stroke-width="1.5"/>
+            <!-- stress spike at meeting -->
+            <path d="M120,26 Q130,10 140,8 Q148,6 152,14 Q156,22 165,28 Q180,34 200,30" fill="none" stroke="rgba(124,255,212,0.7)" stroke-width="2"/>
+            <!-- fill under spike -->
+            <path d="M120,40 Q130,10 140,8 Q148,6 152,14 Q156,22 165,28 Q180,34 200,40 Z" fill="rgba(124,255,212,0.06)"/>
+            <!-- annotation line -->
+            <line x1="142" y1="8" x2="142" y2="44" stroke="rgba(255,107,107,0.4)" stroke-width="1" stroke-dasharray="2,2"/>
+            <circle cx="142" cy="8" r="3" fill="rgba(255,107,107,0.8)"/>
+            <!-- post-meeting calm -->
+            <path d="M200,30 Q220,32 240,28 Q260,26 280,30" fill="none" stroke="rgba(124,255,212,0.35)" stroke-width="1.5"/>
+          </svg>
+          <!-- Legend -->
+          <div class="legend-row" style="margin-top:6px">
+            <div class="legend-item"><div class="legend-dot" style="background:rgba(124,255,212,0.7)"></div>HRV</div>
+            <div class="legend-item"><div class="legend-dot" style="background:#FBBF24"></div>Stress</div>
+            <div class="legend-item"><div class="legend-dot" style="background:#A78BFA"></div>Breath</div>
+            <div class="legend-item"><div class="legend-dot" style="background:#FF6B6B"></div>Spike</div>
+          </div>
+        </div>
+
+        <!-- Events -->
+        <div class="timeline-events">
+          <div class="t-event">
+            <div class="t-time">7:12</div>
+            <div class="t-dot" style="background:rgba(124,255,212,0.7)"></div>
+            <div class="t-line-wrap">
+              <div class="t-title">Morning — Baseline</div>
+              <div class="t-sub">Calm · HRV 78 · Breath 14</div>
+              <div class="t-bar-outer"><div class="t-bar-inner" style="width:25%;background:#7CFFD4"></div></div>
+            </div>
+          </div>
+          <div class="t-event">
+            <div class="t-time">10:00</div>
+            <div class="t-dot" style="background:#FF6B6B"></div>
+            <div class="t-line-wrap">
+              <div class="t-title">Team Meeting — Spike</div>
+              <div class="t-sub">Stress ↑ · HRV 54 · Gut signal</div>
+              <div class="t-bar-outer"><div class="t-bar-inner" style="width:78%;background:#FF6B6B"></div></div>
+            </div>
+          </div>
+          <div class="t-event">
+            <div class="t-time">12:30</div>
+            <div class="t-dot" style="background:#FBBF24"></div>
+            <div class="t-line-wrap">
+              <div class="t-title">Lunch Break</div>
+              <div class="t-sub">Recovery · HRV 66</div>
+              <div class="t-bar-outer"><div class="t-bar-inner" style="width:45%;background:#FBBF24"></div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Pattern insight -->
+        <div class="insight-card">
+          <div class="insight-icon">◈</div>
+          <div>
+            <div class="insight-title">Pattern Detected</div>
+            <div class="insight-body">Your stress spikes precede awareness by ~40 sec. Your body knows first. This week you noticed 3 of 7 signals.</div>
+          </div>
+        </div>
+
+        <div style="height:70px"></div>
+        <div class="bottom-nav">
+          <div class="nav-item"><div class="nav-ico">◎</div><div class="nav-txt">SENSE</div></div>
+          <div class="nav-item active"><div class="nav-ico">◈</div><div class="nav-txt">TIMELINE</div></div>
+          <div class="nav-item"><div class="nav-ico">◇</div><div class="nav-txt">TRAIN</div></div>
+          <div class="nav-item"><div class="nav-ico">◻</div><div class="nav-txt">REFLECT</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCREEN 4: TRAINING -->
+  <div class="phone">
+    <div class="phone-label">04 · Sensory Training</div>
+    <div class="phone-shell">
+      <div class="notch"><div class="cam"></div><div class="pill"></div></div>
+      <div class="screen s-train">
+        <div class="status-bar">
+          <span>09:41</span>
+          <span>● ● ●</span>
+        </div>
+
+        <div>
+          <div class="nav-label">Train</div>
+        </div>
+
+        <!-- Progress ring -->
+        <div class="progress-ring-wrap">
+          <svg width="100" height="100" viewBox="0 0 100 100">
+            <circle cx="50" cy="50" r="44" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="6"/>
+            <circle cx="50" cy="50" r="44" fill="none" stroke="rgba(167,139,250,0.7)" stroke-width="6" stroke-linecap="round" stroke-dasharray="138 138" stroke-dashoffset="55" transform="rotate(-90 50 50)"/>
+            <text x="50" y="45" text-anchor="middle" font-family="Georgia,serif" font-size="18" fill="#F0EEE8">62%</text>
+            <text x="50" y="60" text-anchor="middle" font-family="monospace" font-size="7" fill="rgba(240,238,232,0.4)" letter-spacing="1">STAGE 2</text>
+          </svg>
+        </div>
+
+        <!-- Stage pills -->
+        <div class="stage-pills">
+          <div class="stage-pill done">1 Amplify</div>
+          <div class="stage-pill active">2 Pattern</div>
+          <div class="stage-pill">3 Calibrate</div>
+          <div class="stage-pill">4 Indep.</div>
+        </div>
+
+        <!-- Score strip -->
+        <div class="score-strip">
+          <div class="score-tile">
+            <div class="score-num" style="color:var(--accent)">14</div>
+            <div class="score-lbl">Sessions</div>
+          </div>
+          <div class="score-tile">
+            <div class="score-num" style="color:var(--accent3)">7</div>
+            <div class="score-lbl">Streak</div>
+          </div>
+          <div class="score-tile">
+            <div class="score-num" style="color:#FBBF24">3/5</div>
+            <div class="score-lbl">This Week</div>
+          </div>
+        </div>
+
+        <!-- Exercise card -->
+        <div class="exercise-card">
+          <div class="ex-tag">Today's Exercise</div>
+          <div class="ex-title">Gut Signal<br>Recognition</div>
+          <div class="ex-desc">Notice what your body signals during a low-stakes interaction — before checking any external feedback.</div>
+          <div class="ex-steps">
+            <div class="ex-step"><div class="ex-num">1</div>During next conversation, pause.</div>
+            <div class="ex-step"><div class="ex-num">2</div>Scan gut, chest, breath for 5 sec.</div>
+            <div class="ex-step"><div class="ex-num">3</div>Note your inner read before reacting.</div>
+          </div>
+          <div class="btn-start">Start Exercise</div>
+        </div>
+
+        <div style="height:70px"></div>
+        <div class="bottom-nav">
+          <div class="nav-item"><div class="nav-ico">◎</div><div class="nav-txt">SENSE</div></div>
+          <div class="nav-item"><div class="nav-ico">◈</div><div class="nav-txt">TIMELINE</div></div>
+          <div class="nav-item active"><div class="nav-ico">◇</div><div class="nav-txt">TRAIN</div></div>
+          <div class="nav-item"><div class="nav-ico">◻</div><div class="nav-txt">REFLECT</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ═══════════════════════════════════════════════ -->
+<!-- ROW 3: REFLECTION JOURNAL -->
+<!-- ═══════════════════════════════════════════════ -->
+
+<div class="section-label">03 — Reflection & Patterns</div>
+
+<div class="phones-row">
+
+  <!-- SCREEN 5: REFLECTION -->
+  <div class="phone">
+    <div class="phone-label">05 · Reflection Journal</div>
+    <div class="phone-shell">
+      <div class="notch"><div class="cam"></div><div class="pill"></div></div>
+      <div class="screen s-reflect">
+        <div class="status-bar">
+          <span>09:41</span>
+          <span>● ● ●</span>
+        </div>
+
+        <div>
+          <div class="nav-label">Reflect</div>
+        </div>
+
+        <!-- Pattern bars -->
+        <div class="pattern-overview">
+          <div class="po-title">Weekly Signal Patterns</div>
+          <div class="po-bars">
+            <div class="po-row">
+              <div class="po-lbl">Gut signal</div>
+              <div class="po-bar"><div class="po-fill" style="width:72%;background:#7CFFD4"></div></div>
+              <div class="po-val">72%</div>
+            </div>
+            <div class="po-row">
+              <div class="po-lbl">Stress detect</div>
+              <div class="po-bar"><div class="po-fill" style="width:55%;background:#FBBF24"></div></div>
+              <div class="po-val">55%</div>
+            </div>
+            <div class="po-row">
+              <div class="po-lbl">Breath aware</div>
+              <div class="po-bar"><div class="po-fill" style="width:83%;background:#A78BFA"></div></div>
+              <div class="po-val">83%</div>
+            </div>
+            <div class="po-row">
+              <div class="po-lbl">Emotional read</div>
+              <div class="po-bar"><div class="po-fill" style="width:40%;background:#FF6B6B"></div></div>
+              <div class="po-val">40%</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Journal entries -->
+        <div class="journal-entry">
+          <div class="journal-date">
+            <span>MON · 09 MAR</span>
+            <div class="journal-tag" style="background:rgba(255,107,107,0.1);color:#FF8080">⚡ High signal</div>
+          </div>
+          <div class="journal-body">"Felt the meeting tension in my chest before it was spoken. The device confirmed 3 seconds later — I noticed it first."</div>
+          <div class="journal-signals">
+            <div class="j-sig">💓 HRV drop</div>
+            <div class="j-sig">🫁 Breath shift</div>
+            <div class="j-sig">⚡ Stress +</div>
+          </div>
+        </div>
+
+        <div class="journal-entry">
+          <div class="journal-date">
+            <span>SUN · 08 MAR</span>
+            <div class="journal-tag" style="background:rgba(124,255,212,0.1);color:var(--accent)">◎ Calm</div>
+          </div>
+          <div class="journal-body">"Long walk. Noticed how quickly my body settled without notifications. The silence had texture."</div>
+          <div class="journal-signals">
+            <div class="j-sig">💓 HRV 82</div>
+            <div class="j-sig">🌡 Temp calm</div>
+          </div>
+        </div>
+
+        <div class="add-entry">
+          <div class="add-plus">+</div>
+          <div class="add-label">Add reflection</div>
+        </div>
+
+        <div style="height:70px"></div>
+        <div class="bottom-nav">
+          <div class="nav-item"><div class="nav-ico">◎</div><div class="nav-txt">SENSE</div></div>
+          <div class="nav-item"><div class="nav-ico">◈</div><div class="nav-txt">TIMELINE</div></div>
+          <div class="nav-item"><div class="nav-ico">◇</div><div class="nav-txt">TRAIN</div></div>
+          <div class="nav-item active"><div class="nav-ico">◻</div><div class="nav-txt">REFLECT</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCREEN 6: BODY STATE DASHBOARD -->
+  <div class="phone">
+    <div class="phone-label">06 · Body State Map</div>
+    <div class="phone-shell">
+      <div class="notch"><div class="cam"></div><div class="pill"></div></div>
+      <div class="screen s-bodymap">
+        <div class="status-bar">
+          <span>09:41</span>
+          <span>● ● ●</span>
+        </div>
+
+        <div>
+          <div class="live-badge" style="background:rgba(167,139,250,0.1);border-color:rgba(167,139,250,0.25);color:#A78BFA"><span class="live-dot" style="background:#A78BFA"></span>BODY STATE</div>
+          <div class="nav-label">Body Map</div>
+        </div>
+
+        <!-- Body silhouette with signal zones -->
+        <div style="display:flex;justify-content:center;align-items:center;padding:4px 0">
+          <svg width="160" height="260" viewBox="0 0 160 260">
+            <!-- simple body silhouette -->
+            <!-- head -->
+            <circle cx="80" cy="28" r="22" fill="none" stroke="rgba(255,255,255,0.12)" stroke-width="1.5"/>
+            <!-- neck -->
+            <rect x="72" y="49" width="16" height="14" rx="4" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="1.5"/>
+            <!-- torso -->
+            <path d="M44,63 Q30,65 28,90 L24,145 Q24,155 34,155 L46,155 L46,210 Q46,220 56,220 L72,220 L72,160 L88,160 L88,220 L104,220 Q114,220 114,210 L114,155 L126,155 Q136,155 136,145 L132,90 Q130,65 116,63 Z" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="1.5"/>
+            <!-- arms -->
+            <path d="M44,63 Q20,70 14,105 Q10,125 18,130 L26,130 Q30,110 36,90" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="1.5"/>
+            <path d="M116,63 Q140,70 146,105 Q150,125 142,130 L134,130 Q130,110 124,90" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="1.5"/>
+
+            <!-- HEART zone glow -->
+            <circle cx="68" cy="95" r="14" fill="rgba(255,107,107,0.12)" stroke="rgba(255,107,107,0.35)" stroke-width="1"/>
+            <text x="68" y="99" text-anchor="middle" font-size="12">💓</text>
+            <!-- heart label -->
+            <line x1="55" y1="95" x2="30" y2="85" stroke="rgba(255,107,107,0.4)" stroke-width="0.8"/>
+            <text x="26" y="83" text-anchor="end" font-family="monospace" font-size="7" fill="rgba(255,107,107,0.8)">HEART</text>
+            <text x="26" y="92" text-anchor="end" font-family="monospace" font-size="7" fill="rgba(255,255,255,0.4)">68 BPM</text>
+
+            <!-- GUT zone glow -->
+            <circle cx="80" cy="128" r="16" fill="rgba(124,255,212,0.1)" stroke="rgba(124,255,212,0.3)" stroke-width="1"/>
+            <text x="80" y="132" text-anchor="middle" font-size="11">🫃</text>
+            <!-- gut label -->
+            <line x1="96" y1="128" x2="120" y2="118" stroke="rgba(124,255,212,0.4)" stroke-width="0.8"/>
+            <text x="122" y="116" font-family="monospace" font-size="7" fill="rgba(124,255,212,0.8)">GUT</text>
+            <text x="122" y="125" font-family="monospace" font-size="7" fill="rgba(255,255,255,0.4)">Active</text>
+
+            <!-- BREATH zone -->
+            <ellipse cx="80" cy="80" rx="22" ry="10" fill="rgba(167,139,250,0.08)" stroke="rgba(167,139,250,0.25)" stroke-width="1"/>
+            <line x1="102" y1="76" x2="128" y2="66" stroke="rgba(167,139,250,0.4)" stroke-width="0.8"/>
+            <text x="130" y="64" font-family="monospace" font-size="7" fill="rgba(167,139,250,0.8)">BREATH</text>
+            <text x="130" y="73" font-family="monospace" font-size="7" fill="rgba(255,255,255,0.4)">16 rpm</text>
+
+            <!-- SKIN temp indicators on arms -->
+            <circle cx="20" cy="115" r="6" fill="rgba(251,191,36,0.15)" stroke="rgba(251,191,36,0.4)" stroke-width="1"/>
+            <circle cx="140" cy="115" r="6" fill="rgba(251,191,36,0.15)" stroke="rgba(251,191,36,0.4)" stroke-width="1"/>
+            <line x1="20" y1="122" x2="20" y2="135" stroke="rgba(251,191,36,0.4)" stroke-width="0.8"/>
+            <text x="20" y="145" text-anchor="middle" font-family="monospace" font-size="7" fill="rgba(251,191,36,0.8)">36.2°</text>
+
+            <!-- NERVOUS SYSTEM spine line -->
+            <line x1="80" y1="63" x2="80" y2="155" stroke="rgba(124,255,212,0.15)" stroke-width="2" stroke-dasharray="3,3"/>
+          </svg>
+        </div>
+
+        <!-- Signal legend strip -->
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:12px 14px;">
+          <div style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.2em;color:var(--muted);margin-bottom:10px;text-transform:uppercase;">Signal Status</div>
+          <div style="display:flex;flex-direction:column;gap:8px;">
+            <div style="display:flex;align-items:center;justify-content:space-between;">
+              <div style="display:flex;align-items:center;gap:8px;font-size:11px;color:rgba(255,107,107,0.9)">💓 Heart rhythm</div>
+              <div style="font-family:'DM Mono',monospace;font-size:10px;color:rgba(255,255,255,0.5)">Elevated ↑</div>
+            </div>
+            <div style="display:flex;align-items:center;justify-content:space-between;">
+              <div style="display:flex;align-items:center;gap:8px;font-size:11px;color:rgba(124,255,212,0.9)">🌊 Gut activity</div>
+              <div style="font-family:'DM Mono',monospace;font-size:10px;color:rgba(255,255,255,0.5)">Signal active</div>
+            </div>
+            <div style="display:flex;align-items:center;justify-content:space-between;">
+              <div style="display:flex;align-items:center;gap:8px;font-size:11px;color:rgba(167,139,250,0.9)">🫁 Breath rate</div>
+              <div style="font-family:'DM Mono',monospace;font-size:10px;color:rgba(255,255,255,0.5)">Shallow</div>
+            </div>
+          </div>
+        </div>
+
+        <div style="height:70px"></div>
+        <div class="bottom-nav">
+          <div class="nav-item active"><div class="nav-ico">◎</div><div class="nav-txt">SENSE</div></div>
+          <div class="nav-item"><div class="nav-ico">◈</div><div class="nav-txt">TIMELINE</div></div>
+          <div class="nav-item"><div class="nav-ico">◇</div><div class="nav-txt">TRAIN</div></div>
+          <div class="nav-item"><div class="nav-ico">◻</div><div class="nav-txt">REFLECT</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ═══════════════════════════════════════════════ -->
+<!-- INTERACTION LEGEND -->
+<!-- ═══════════════════════════════════════════════ -->
+
+<div class="section-label">04 — Device Feedback Logic</div>
+
+<div style="max-width:740px;margin:0 auto;background:var(--surface);border:1px solid var(--border);border-radius:24px;padding:32px 36px;">
+  <div style="font-family:'DM Serif Display',serif;font-size:22px;font-weight:400;margin-bottom:24px;line-height:1.2">Signal → Feedback Loop</div>
+  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;">
+
+    <div style="background:var(--surface2);border:1px solid var(--border);border-radius:16px;padding:18px;">
+      <div style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.2em;color:var(--accent);text-transform:uppercase;margin-bottom:12px;">HRV Spike</div>
+      <div style="font-size:22px;margin-bottom:10px">📳</div>
+      <div style="font-family:'DM Serif Display',serif;font-size:16px;margin-bottom:6px;">Haptic Pulse</div>
+      <div style="font-size:11px;color:var(--muted);line-height:1.6;font-weight:300;">3 gentle vibration pulses mirroring the heart rhythm shift.</div>
+    </div>
+
+    <div style="background:var(--surface2);border:1px solid var(--border);border-radius:16px;padding:18px;">
+      <div style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.2em;color:#A78BFA;text-transform:uppercase;margin-bottom:12px;">Breath Change</div>
+      <div style="font-size:22px;margin-bottom:10px">💨</div>
+      <div style="font-family:'DM Serif Display',serif;font-size:16px;margin-bottom:6px;">Pressure Pulse</div>
+      <div style="font-size:11px;color:var(--muted);line-height:1.6;font-weight:300;">Band tightens / loosens in sync with detected breath pattern.</div>
+    </div>
+
+    <div style="background:var(--surface2);border:1px solid var(--border);border-radius:16px;padding:18px;">
+      <div style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.2em;color:#FBBF24;text-transform:uppercase;margin-bottom:12px;">Stress Peak</div>
+      <div style="font-size:22px;margin-bottom:10px">🌡</div>
+      <div style="font-family:'DM Serif Display',serif;font-size:16px;margin-bottom:6px;">Warmth Shift</div>
+      <div style="font-size:11px;color:var(--muted);line-height:1.6;font-weight:300;">Thermal pad on wrist gently warms — bodily grounding cue.</div>
+    </div>
+
+  </div>
+
+  <div style="margin-top:20px;padding:16px;background:rgba(124,255,212,0.04);border:1px dashed rgba(124,255,212,0.15);border-radius:14px;">
+    <div style="font-family:'DM Mono',monospace;font-size:10px;letter-spacing:0.2em;color:var(--accent);margin-bottom:6px;text-transform:uppercase;">Design Principle</div>
+    <div style="font-family:'DM Serif Display',serif;font-style:italic;font-size:15px;color:rgba(240,238,232,0.8);line-height:1.5">"The device never tells you what you feel. It helps you feel it yourself."</div>
+  </div>
+</div>
+
+<footer>
+  <div class="divider-line"></div>
+  <div style="padding-top:40px">
+    <div class="f-brand">Undercurrent</div>
+    <div class="f-tagline">Training Authenticity Perception · FigBuild 2026</div>
+  </div>
+</footer>
+
+</body>
+</html>
